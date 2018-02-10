@@ -21,8 +21,7 @@ RSpec.describe PostgresEventStore::EventStore do
     end
 
     it 'saves multiple typed events' do
-      event_store.save(stream_id, ItemAdded.new(item_id: 1, name: 'test'))
-      event_store.save(stream_id, ItemRemoved.new(item_id: 1))
+      event_store.save(stream_id, [ItemAdded.new(item_id: 1, name: 'test'), ItemRemoved.new(item_id: 1)])
       events = database[:events].all
       expect(events.count).to eq 2
       event_1 = events[0]
@@ -47,8 +46,7 @@ RSpec.describe PostgresEventStore::EventStore do
     end
 
     it 'saves multiple events' do
-      event_store.save(stream_id, PostgresEventStore::EventData.new(type: 'test', data: {a: 'b'}))
-      event_store.save(stream_id, PostgresEventStore::EventData.new(type: 'test2', data: {c: 'd'}))
+      event_store.save(stream_id, [PostgresEventStore::EventData.new(type: 'test', data: {a: 'b'}), PostgresEventStore::EventData.new(type: 'test2', data: {c: 'd'})])
       events = database[:events].all
       expect(events.count).to eq 2
       event_1 = events[0]

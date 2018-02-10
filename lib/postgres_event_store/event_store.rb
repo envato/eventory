@@ -11,7 +11,7 @@ module PostgresEventStore
       event_count = events.count
       database.transaction do
         number = claim_next_event_sequence_numbers(event_count)
-        stream_version = stream_version(stream_id, event_count)
+        stream_version = stream_version(stream_id)
         raise ConcurrencyError if expected_version && expected_version != stream_version
         stream_version += 1
         events.each do |event|
