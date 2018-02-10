@@ -18,6 +18,8 @@ CREATE TABLE event_counter (
   number INT
 );
 INSERT INTO event_counter (number) VALUES (0);
+CREATE RULE no_insert_event_counter AS ON INSERT TO event_counter DO INSTEAD NOTHING;
+CREATE RULE no_delete_event_counter AS ON DELETE TO event_counter DO INSTEAD NOTHING;
 
 CREATE TABLE checkpoints (
   id SERIAL PRIMARY KEY NOT NULL,

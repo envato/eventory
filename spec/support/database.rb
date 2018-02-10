@@ -24,8 +24,8 @@ RSpec.configure do |config|
     $db = DatabaseHelpers.connect_database
 
     DatabaseCleaner[:sequel].db = $db
-    DatabaseCleaner[:sequel].clean_with(:truncation)
-    $db[:event_counter].insert(number: 0)
+    DatabaseCleaner[:sequel].clean_with(:truncation, except: %w[ event_counter ])
+    $db[:event_counter].update(number: 0)
   end
 
   config.before(:each) do |example|
