@@ -28,6 +28,14 @@ module PostgresEventStore
       end
     end
 
+    def read_all_events_from(number, limit: 1000)
+      database[:events]
+        .where(Sequel.lit('number >= ?', number))
+        .order(:number)
+        .limit(limit)
+        .map { |r| build_recorded_event(r) }
+    end
+
     private
 
     attr_reader :database
@@ -48,6 +56,18 @@ module PostgresEventStore
     # @return Integer the starting stream version number
     def update_stream_version(stream_id, event_count)
       database[:events].where(stream_id: stream_id).max(:stream_version) || 0
+    end
+
+    def build_recorded_event(row)
+      RecordedEvent.new(
+        number: row[:number],
+        id: row[:id],
+        stream_id: row[:stream_id],
+        stream_version: row[:stream_version],
+        type: row[:type],
+        data: row[:data].to_h,
+        recorded_at: row[:recorded_at],
+      )
     end
   end
 end
