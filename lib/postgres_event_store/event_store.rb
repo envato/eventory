@@ -10,8 +10,7 @@ module PostgresEventStore
       database.transaction do
         stream_version = update_stream_version(stream_id, event_count)
 
-        high_sequence = database[:event_counter].returning(:number).update(Sequel.lit("number = number + #{event_count}")).first[:number]
-        sequence = high_sequence - events.count + 1
+        sequence = claim_next_event_sequence_numbers(event_count)
         events.each do |event|
           database[:events].insert(
             sequence: sequence,
@@ -42,6 +41,15 @@ module PostgresEventStore
         database[:streams].insert(id: stream_id, version: event_count)
       end
       stream_version
+    end
+
+    # Claim the next `event_count` sequence numbers
+    #
+    # This also places a row level rock on the single event counter row,
+    # effectively serialising event inserts.
+    def claim_next_event_sequence_numbers(event_count)
+      high_sequence = database[:event_counter].returning(:number).update(Sequel.lit("number = number + #{event_count}")).first[:number]
+      high_sequence - event_count + 1
     end
   end
 end
