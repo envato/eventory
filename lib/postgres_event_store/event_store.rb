@@ -58,7 +58,7 @@ module PostgresEventStore
     # Update and return the starting stream version number
     #
     # @return Integer the starting stream version number
-    def stream_version(stream_id, event_count)
+    def stream_version(stream_id)
       database[:events].where(stream_id: stream_id).max(:stream_version) || 0
     end
 
