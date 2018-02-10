@@ -40,4 +40,21 @@ RSpec.describe PostgresEventStore::EventStore do
       expect(event_2[:recorded_at]).to be_an_instance_of(Time)
     end
   end
+
+  it "doesn't increment the sequence number if the transaction is aborted" do
+    tmp_db = DatabaseHelpers.connect_database
+    long_type_name = 't' * 256
+    begin
+      expect {
+        PostgresEventStore::EventStore.new(database: tmp_db)
+          .save(stream_id, PostgresEventStore::EventData.new(type: long_type_name, data: {}))
+      }.to raise_error(Sequel::DatabaseError)
+      expect(database[:events].count).to eq 0
+      event_store.save(stream_id, PostgresEventStore::EventData.new(type: 'test', data: {}))
+      expect(database[:events].map {|e| e[:sequence]}).to eq([1])
+    ensure
+      tmp_db.disconnect
+    end
+  end
+
 end
