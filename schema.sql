@@ -18,3 +18,11 @@ CREATE TABLE event_counter (
   number INT
 );
 INSERT INTO event_counter (number) VALUES (0);
+
+CREATE TABLE checkpoints (
+  id SERIAL PRIMARY KEY NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  position BIGINT NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+CREATE INDEX checkpoints_name ON checkpoints (name);
