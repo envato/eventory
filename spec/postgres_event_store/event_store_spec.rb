@@ -191,6 +191,15 @@ RSpec.describe PostgresEventStore::EventStore do
         expect(events.count).to eq 1
         expect(events[0].type).to eq 'test'
       end
+
+      it 'filters by event type if types is given' do
+        events = event_store.read_all_events_from(1, types: ['test'])
+        expect(events.count).to eq 1
+        expect(events[0].type).to eq 'test'
+        events = event_store.read_all_events_from(1, types: ['ItemAdded'])
+        expect(events.count).to eq 1
+        expect(events[0].type).to eq 'ItemAdded'
+      end
     end
 
     describe '#read_stream_events_from' do

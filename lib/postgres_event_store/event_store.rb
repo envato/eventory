@@ -28,8 +28,10 @@ module PostgresEventStore
       end
     end
 
-    def read_all_events_from(number, limit: 1000)
-      database[:events]
+    def read_all_events_from(number, types: nil, limit: 1000)
+      query = database[:events]
+      query = query.where(type: Array(types)) if types
+      query
         .where(Sequel.lit('number >= ?', number))
         .order(:number)
         .limit(limit)
