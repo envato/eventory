@@ -44,17 +44,7 @@ module PostgresEventStore
     #
     # @return Integer the starting stream version number
     def update_stream_version(stream_id, event_count)
-      row = database[:streams].for_update.where(id: stream_id).first
-      stream_version = nil
-      if row
-        stream_version = row[:version]
-        database[:streams].where(id: stream_id).update(version: stream_version + event_count)
-      else
-        stream_version = 0
-        database[:streams].insert(id: stream_id, version: event_count)
-      end
-      stream_version
+      database[:events].where(stream_id: stream_id).max(:stream_version) || 0
     end
-
   end
 end

@@ -18,11 +18,3 @@ CREATE TABLE event_counter (
   number INT
 );
 INSERT INTO event_counter (number) VALUES (0);
-
-CREATE TABLE streams (
-  id UUID PRIMARY KEY NOT NULL,
-  version BIGINT NOT NULL,
-  created_at timestamp with time zone DEFAULT now() NOT NULL
-);
-
-CREATE UNIQUE INDEX streams_id_version ON streams (id, version);
