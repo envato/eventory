@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE events (
-  sequence BIGINT NOT NULL,
+  number BIGINT NOT NULL,
   id UUID DEFAULT uuid_generate_v4() NOT NULL PRIMARY KEY,
   stream_id UUID NOT NULL,
   stream_version BIGINT NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE events (
   recorded_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE UNIQUE INDEX events_sequence_index ON events USING btree (sequence);
+CREATE UNIQUE INDEX events_number_index ON events USING btree (number);
 CREATE INDEX events_stream_id_index ON events USING btree (stream_id);
 CREATE INDEX events_recorded_at_index ON events USING btree (recorded_at);
 

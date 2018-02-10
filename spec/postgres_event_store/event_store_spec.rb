@@ -9,7 +9,7 @@ RSpec.describe PostgresEventStore::EventStore do
     expect(events.count).to eq 1
     event = events[0]
     aggregate_failures do
-      expect(event[:sequence]).to eq 1
+      expect(event[:number]).to eq 1
       expect(event[:stream_id]).to eq stream_id
       expect(event[:stream_version]).to eq 1
       expect(event[:type]).to eq 'test'
@@ -27,7 +27,7 @@ RSpec.describe PostgresEventStore::EventStore do
     event_1 = events[0]
     event_2 = events[1]
     aggregate_failures do
-      expect(event_1[:sequence]).to eq 1
+      expect(event_1[:number]).to eq 1
       expect(event_1[:stream_id]).to eq stream_id
       expect(event_1[:stream_version]).to eq 1
       expect(event_1[:type]).to eq 'ItemAdded'
@@ -35,7 +35,7 @@ RSpec.describe PostgresEventStore::EventStore do
       expect(event_1[:id]).to be_an_instance_of(String)
       expect(event_1[:recorded_at]).to be_an_instance_of(Time)
 
-      expect(event_2[:sequence]).to eq 2
+      expect(event_2[:number]).to eq 2
       expect(event_2[:stream_id]).to eq stream_id
       expect(event_2[:stream_version]).to eq 2
       expect(event_2[:type]).to eq 'ItemRemoved'
@@ -53,7 +53,7 @@ RSpec.describe PostgresEventStore::EventStore do
     event_1 = events[0]
     event_2 = events[1]
     aggregate_failures do
-      expect(event_1[:sequence]).to eq 1
+      expect(event_1[:number]).to eq 1
       expect(event_1[:stream_id]).to eq stream_id
       expect(event_1[:stream_version]).to eq 1
       expect(event_1[:type]).to eq 'test'
@@ -61,7 +61,7 @@ RSpec.describe PostgresEventStore::EventStore do
       expect(event_1[:id]).to be_an_instance_of(String)
       expect(event_1[:recorded_at]).to be_an_instance_of(Time)
 
-      expect(event_2[:sequence]).to eq 2
+      expect(event_2[:number]).to eq 2
       expect(event_2[:stream_id]).to eq stream_id
       expect(event_2[:stream_version]).to eq 2
       expect(event_2[:type]).to eq 'test2'
@@ -71,7 +71,7 @@ RSpec.describe PostgresEventStore::EventStore do
     end
   end
 
-  it "doesn't increment the sequence number if the transaction is aborted" do
+  it "doesn't increment the number number if the transaction is aborted" do
     tmp_db = DatabaseHelpers.connect_database
     long_type_name = 't' * 256
     begin
@@ -81,7 +81,7 @@ RSpec.describe PostgresEventStore::EventStore do
       }.to raise_error(Sequel::DatabaseError)
       expect(database[:events].count).to eq 0
       event_store.save(stream_id, PostgresEventStore::EventData.new(type: 'test', data: {}))
-      expect(database[:events].map {|e| e[:sequence]}).to eq([1])
+      expect(database[:events].map {|e| e[:number]}).to eq([1])
     ensure
       tmp_db.disconnect
     end
