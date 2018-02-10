@@ -15,8 +15,7 @@ module PostgresEventStore
         raise ConcurrencyError if expected_version && expected_version != stream_version
         stream_version += 1
         events.each do |event|
-          event_data = event.to_event_data
-          insert_event(number, stream_id, stream_version, event_data)
+          insert_event(number, stream_id, stream_version, event.to_event_data)
           stream_version += 1
           number += 1
         end
