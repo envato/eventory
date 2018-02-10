@@ -1,15 +1,18 @@
 module PostgresEventStore
+  ConcurrencyError = Class.new(StandardError)
+
   class EventStore
     def initialize(database:)
       @database = database
     end
 
-    def save(stream_id, events)
+    def save(stream_id, events, expected_version: nil)
       events = Array(events)
       event_count = events.count
       database.transaction do
         number = claim_next_event_sequence_numbers(event_count)
         stream_version = update_stream_version(stream_id, event_count)
+        raise ConcurrencyError if expected_version && expected_version != stream_version
         events.each do |event|
           event_data = event.to_event_data
           database[:events].insert(

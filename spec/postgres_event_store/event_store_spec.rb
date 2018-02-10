@@ -86,4 +86,35 @@ RSpec.describe PostgresEventStore::EventStore do
       tmp_db.disconnect
     end
   end
+
+  context 'optimistic locking' do
+    let(:event) { PostgresEventStore::EventData.new(type: 'test', data: { a: 'b' }) }
+    let(:event_2) { PostgresEventStore::EventData.new(type: 'test', data: { a: 'c' }) }
+
+    context "when the stream doesn't exist" do
+      it 'saves the event if the version is correct' do
+        event_store.save(stream_id, event, expected_version: 0)
+      end
+
+      it 'raises a concurrency error if the version is incorrect' do
+        expect {
+          event_store.save(stream_id, event, expected_version: 1)
+        }.to raise_error(PostgresEventStore::ConcurrencyError)
+      end
+    end
+
+    context 'when the stream exists' do
+      before { event_store.save(stream_id, event_2) }
+
+      it 'saves the event if the version is correct' do
+        event_store.save(stream_id, event, expected_version: 1)
+      end
+
+      it 'raises a concurrency error if the version is incorrect' do
+        expect {
+          event_store.save(stream_id, event, expected_version: 2)
+        }.to raise_error(PostgresEventStore::ConcurrencyError)
+      end
+    end
+  end
 end
