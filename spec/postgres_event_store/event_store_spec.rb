@@ -11,6 +11,7 @@ RSpec.describe PostgresEventStore::EventStore do
     aggregate_failures do
       expect(event[:sequence]).to eq 1
       expect(event[:stream_id]).to eq stream_id
+      expect(event[:stream_version]).to eq 1
       expect(event[:type]).to eq 'test'
       expect(event[:data]).to eq('a' => 'b')
       expect(event[:id]).to eq event_id
@@ -28,12 +29,15 @@ RSpec.describe PostgresEventStore::EventStore do
     aggregate_failures do
       expect(event_1[:sequence]).to eq 1
       expect(event_1[:stream_id]).to eq stream_id
+      expect(event_1[:stream_version]).to eq 1
       expect(event_1[:type]).to eq 'test'
       expect(event_1[:data]).to eq('a' => 'b')
       expect(event_1[:id]).to be_an_instance_of(String)
       expect(event_1[:recorded_at]).to be_an_instance_of(Time)
+
       expect(event_2[:sequence]).to eq 2
       expect(event_2[:stream_id]).to eq stream_id
+      expect(event_2[:stream_version]).to eq 2
       expect(event_2[:type]).to eq 'test2'
       expect(event_2[:data]).to eq('c' => 'd')
       expect(event_2[:id]).to be_an_instance_of(String)
@@ -56,5 +60,4 @@ RSpec.describe PostgresEventStore::EventStore do
       tmp_db.disconnect
     end
   end
-
 end

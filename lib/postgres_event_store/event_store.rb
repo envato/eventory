@@ -6,13 +6,17 @@ module PostgresEventStore
 
     def save(stream_id, events)
       events = Array(events)
+      event_count = events.count
       database.transaction do
-        high_sequence = database[:event_counter].returning(:number).update(Sequel.lit("number = number + #{events.count}")).first[:number]
+        stream_version = update_stream_version(stream_id, event_count)
+
+        high_sequence = database[:event_counter].returning(:number).update(Sequel.lit("number = number + #{event_count}")).first[:number]
         sequence = high_sequence - events.count + 1
         events.each do |event|
           database[:events].insert(
             sequence: sequence,
             stream_id: stream_id,
+            stream_version: stream_version += 1,
             id: event.id,
             type: event.type,
             data: Sequel.pg_jsonb(event.data)
@@ -25,5 +29,19 @@ module PostgresEventStore
     private
 
     attr_reader :database
+
+    def update_stream_version(stream_id, event_count)
+      row = database[:streams].for_update.where(id: stream_id).first
+      stream_version = nil
+      if row
+        stream_version = row[:version]
+        database[:streams].where(id: stream_id).update(version: stream_version + event_count)
+      else
+        stream_version = 0
+        # TODO: handle race condition here
+        database[:streams].insert(id: stream_id, version: event_count)
+      end
+      stream_version
+    end
   end
 end
