@@ -8,9 +8,8 @@ module PostgresEventStore
       events = Array(events)
       event_count = events.count
       database.transaction do
-        stream_version = update_stream_version(stream_id, event_count)
-
         sequence = claim_next_event_sequence_numbers(event_count)
+        stream_version = update_stream_version(stream_id, event_count)
         events.each do |event|
           database[:events].insert(
             sequence: sequence,
@@ -29,6 +28,20 @@ module PostgresEventStore
 
     attr_reader :database
 
+    # Claim the next `event_count` sequence numbers
+    #
+    # This also places a row level rock on the single event counter row,
+    # effectively serialising event inserts.
+    #
+    # @return Integer the starting event sequence number
+    def claim_next_event_sequence_numbers(event_count)
+      high_sequence = database[:event_counter].returning(:number).update(Sequel.lit("number = number + #{event_count}")).first[:number]
+      high_sequence - event_count + 1
+    end
+
+    # Update and return the starting stream version number
+    #
+    # @return Integer the starting stream version number
     def update_stream_version(stream_id, event_count)
       row = database[:streams].for_update.where(id: stream_id).first
       stream_version = nil
@@ -37,19 +50,10 @@ module PostgresEventStore
         database[:streams].where(id: stream_id).update(version: stream_version + event_count)
       else
         stream_version = 0
-        # TODO: handle race condition here
         database[:streams].insert(id: stream_id, version: event_count)
       end
       stream_version
     end
 
-    # Claim the next `event_count` sequence numbers
-    #
-    # This also places a row level rock on the single event counter row,
-    # effectively serialising event inserts.
-    def claim_next_event_sequence_numbers(event_count)
-      high_sequence = database[:event_counter].returning(:number).update(Sequel.lit("number = number + #{event_count}")).first[:number]
-      high_sequence - event_count + 1
-    end
   end
 end
