@@ -1,8 +1,3 @@
-class ItemAdded < PostgresEventStore::Event
-  attribute :item_id
-  attribute :name
-end
-
 RSpec.describe PostgresEventStore::Event do
   let(:event) { ItemAdded.new(item_id: 1, name: 'test') }
 

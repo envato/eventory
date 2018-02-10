@@ -11,13 +11,14 @@ module PostgresEventStore
         sequence = claim_next_event_sequence_numbers(event_count)
         stream_version = update_stream_version(stream_id, event_count)
         events.each do |event|
+          event_data = event.to_event_data
           database[:events].insert(
             sequence: sequence,
             stream_id: stream_id,
             stream_version: stream_version += 1,
-            id: event.id,
-            type: event.type,
-            data: Sequel.pg_jsonb(event.data)
+            id: event_data.id,
+            type: event_data.type,
+            data: Sequel.pg_jsonb(event_data.data)
           )
           sequence += 1
         end
