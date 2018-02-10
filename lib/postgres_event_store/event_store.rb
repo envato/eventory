@@ -36,6 +36,13 @@ module PostgresEventStore
         .map { |r| build_recorded_event(r) }
     end
 
+    def read_stream_events(stream_id)
+      database[:events]
+        .where(stream_id: stream_id)
+        .order(:stream_version)
+        .map { |r| build_recorded_event(r) }
+    end
+
     private
 
     attr_reader :database
