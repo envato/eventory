@@ -25,6 +25,10 @@ module PostgresEventStore
       end
     end
 
+    def transaction(&block)
+      @database.transaction(&block)
+    end
+
     private
 
     def checkpoints
