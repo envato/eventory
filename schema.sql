@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE events (
-  sequence INT NOT NULL,
+  sequence BIGINT NOT NULL,
   id UUID DEFAULT uuid_generate_v4() NOT NULL PRIMARY KEY,
   stream_id UUID NOT NULL,
   type VARCHAR(255) NOT NULL,
