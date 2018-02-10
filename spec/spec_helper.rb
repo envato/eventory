@@ -1,6 +1,7 @@
 require "bundler/setup"
 require "postgres_event_store"
 require 'pry'
+require 'securerandom'
 
 Dir.glob(File.dirname(__FILE__) + '/support/**/*.rb') { |f| require f }
 
