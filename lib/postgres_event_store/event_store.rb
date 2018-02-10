@@ -69,13 +69,13 @@ module PostgresEventStore
 
     def build_recorded_event(row)
       RecordedEvent.new(
-        number: row[:number],
-        id: row[:id],
-        stream_id: row[:stream_id],
-        stream_version: row[:stream_version],
-        type: row[:type],
-        data: row[:data].to_h,
-        recorded_at: row[:recorded_at],
+        number: row.fetch(:number),
+        id: row.fetch(:id),
+        stream_id: row.fetch(:stream_id),
+        stream_version: row.fetch(:stream_version),
+        type: row.fetch(:type),
+        data: row.fetch(:data).to_h,
+        recorded_at: row.fetch(:recorded_at)
       )
     end
   end
