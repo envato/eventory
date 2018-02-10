@@ -11,18 +11,13 @@ module PostgresEventStore
       event_count = events.count
       database.transaction do
         number = claim_next_event_sequence_numbers(event_count)
-        stream_version = update_stream_version(stream_id, event_count)
+        stream_version = stream_version(stream_id, event_count)
         raise ConcurrencyError if expected_version && expected_version != stream_version
+        stream_version += 1
         events.each do |event|
           event_data = event.to_event_data
-          database[:events].insert(
-            number: number,
-            stream_id: stream_id,
-            stream_version: stream_version += 1,
-            id: event_data.id,
-            type: event_data.type,
-            data: Sequel.pg_jsonb(event_data.data)
-          )
+          insert_event(number, stream_id, stream_version, event_data)
+          stream_version += 1
           number += 1
         end
       end
@@ -63,7 +58,7 @@ module PostgresEventStore
     # Update and return the starting stream version number
     #
     # @return Integer the starting stream version number
-    def update_stream_version(stream_id, event_count)
+    def stream_version(stream_id, event_count)
       database[:events].where(stream_id: stream_id).max(:stream_version) || 0
     end
 
@@ -76,6 +71,17 @@ module PostgresEventStore
         type: row.fetch(:type),
         data: row.fetch(:data).to_h,
         recorded_at: row.fetch(:recorded_at)
+      )
+    end
+
+    def insert_event(number, stream_id, stream_version, event_data)
+      database[:events].insert(
+        number: number,
+        stream_id: stream_id,
+        stream_version: stream_version,
+        id: event_data.id,
+        type: event_data.type,
+        data: Sequel.pg_jsonb(event_data.data)
       )
     end
   end
