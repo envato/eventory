@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "pry"
+  spec.add_development_dependency "database_cleaner"
   spec.add_dependency "pg"
   spec.add_dependency 'sequel', '~> 5.5'
 end

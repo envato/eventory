@@ -1,5 +1,8 @@
 require "bundler/setup"
 require "postgres_event_store"
+require 'pry'
+
+Dir.glob(File.dirname(__FILE__) + '/support/**/*.rb') { |f| require f }
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

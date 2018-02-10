@@ -1,5 +1,6 @@
-require "postgres_event_store/version"
+require 'sequel'
+require 'postgres_event_store/version'
+require 'postgres_event_store/event_store'
 
 module PostgresEventStore
-  # Your code goes here...
 end
