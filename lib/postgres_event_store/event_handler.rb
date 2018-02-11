@@ -2,13 +2,12 @@ module PostgresEventStore
   module EventHandler
     def self.included(base)
       base.extend(ClassMethods)
-      base.class_eval do
-        @event_handlers = Hash.new { |hash, key| hash[key] = [] }
-      end
     end
 
     module ClassMethods
-      attr_reader :event_handlers
+      def event_handlers
+        @event_handlers ||= Hash.new { |hash, key| hash[key] = [] }
+      end
 
       def on(*event_classes, &block)
         event_classes.each do |event_class|
