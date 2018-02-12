@@ -29,6 +29,8 @@ module PostgresEventStore
       @database.transaction(&block)
     end
 
+    attr_reader :name
+
     private
 
     def checkpoints
