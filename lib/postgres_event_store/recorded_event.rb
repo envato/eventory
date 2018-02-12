@@ -7,25 +7,18 @@ module PostgresEventStore
                 :type,
                 :data
 
-    def self.resolve_type(type)
-      Object.const_get(type)
-    rescue NameError
-      nil
-    end
-
     def initialize(number:, id:, stream_id:, stream_version:, type:, data:, recorded_at:)
       @number = number
       @id = id
       @stream_id = stream_id
       @stream_version = stream_version
       @type = type
-      event_class = self.class.resolve_type(type)
-      @data = if event_class
-        event_class.new(data)
-      else
-        data
-      end
+      @data = data
       @recorded_at = recorded_at
+    end
+
+    def event_type_class
+      data.class
     end
   end
 end

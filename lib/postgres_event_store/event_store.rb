@@ -2,8 +2,9 @@ module PostgresEventStore
   ConcurrencyError = Class.new(StandardError)
 
   class EventStore
-    def initialize(database:)
+    def initialize(database:, event_builder: EventBuilder.new)
       @database = database
+      @event_builder = event_builder
     end
 
     def save(stream_id, events, expected_version: nil)
@@ -62,13 +63,14 @@ module PostgresEventStore
     end
 
     def build_recorded_event(row)
+      event = @event_builder.build(type: row.fetch(:type), data: row.fetch(:data).to_h)
       RecordedEvent.new(
         number: row.fetch(:number),
         id: row.fetch(:id),
         stream_id: row.fetch(:stream_id),
         stream_version: row.fetch(:stream_version),
         type: row.fetch(:type),
-        data: row.fetch(:data).to_h,
+        data: event,
         recorded_at: row.fetch(:recorded_at)
       )
     end
