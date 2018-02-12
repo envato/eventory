@@ -4,7 +4,7 @@ module PostgresEventStore
       @checkpoint = checkpoint
       @subscription = Subscription.new(
         event_store: event_store,
-        from_event_number: checkpoint.position,
+        from_event_number: checkpoint.position + 1,
         event_types: event_types,
         batch_size: batch_size,
         sleep: sleep

@@ -10,10 +10,10 @@ RSpec.describe PostgresEventStore::PersistentSubscription do
     allow(subscription).to receive(:start).and_yield(events)
   end
 
-  it 'uses a Subscription with relevant args' do
+  it 'uses a Subscription with correct args' do
     expect(PostgresEventStore::Subscription).to receive(:new).with(
       event_store: event_store,
-      from_event_number: 0,
+      from_event_number: 1,
       event_types: ['test'],
       batch_size: 1000,
       sleep: 0.5
