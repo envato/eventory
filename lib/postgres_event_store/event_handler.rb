@@ -14,6 +14,10 @@ module PostgresEventStore
           event_handlers[event_class] << block
         end
       end
+
+      def handled_event_classes
+        event_handlers.keys
+      end
     end
 
     def handle(recorded_events)

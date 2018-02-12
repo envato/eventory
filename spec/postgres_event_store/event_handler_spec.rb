@@ -6,12 +6,12 @@ class TestHandler
     @removed = []
   end
 
-  on ItemAdded do |event|
-    @added << event
+  on ItemAdded do |recorded_event|
+    @added << recorded_event
   end
 
-  on ItemRemoved do |event|
-    @removed << event
+  on ItemRemoved do |recorded_event|
+    @removed << recorded_event
   end
 
   attr_accessor :added, :removed
@@ -19,9 +19,9 @@ end
 
 RSpec.describe PostgresEventStore::EventHandler do
   subject(:event_handler) { TestHandler.new }
-  let(:item_added) { ItemAdded.new(item_id: 1, name: 'Test!') }
-  let(:item_removed) { ItemRemoved.new(item_id: 1) }
-  let(:item_starred) { ItemStarred.new(item_id: 1) }
+  let(:item_added) { recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 1, name: 'Test!')) }
+  let(:item_removed) { recorded_event(type: 'ItemRemoved', data: ItemRemoved.new(item_id: 1)) }
+  let(:item_starred) { recorded_event(type: 'ItemStarred', data: ItemStarred.new(item_id: 1)) }
 
   it 'calls the correct block for each event type' do
     event_handler.handle([item_added, item_removed])
@@ -32,5 +32,9 @@ RSpec.describe PostgresEventStore::EventHandler do
   it 'ignores unknown event types' do
     event_handler.handle(item_starred)
     expect(event_handler.added + event_handler.removed).to eq []
+  end
+
+  it 'returns handled event classes' do
+    expect(TestHandler.handled_event_classes).to eq([ItemAdded, ItemRemoved, ItemStarred])
   end
 end
