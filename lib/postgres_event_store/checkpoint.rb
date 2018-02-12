@@ -1,8 +1,9 @@
 module PostgresEventStore
   class Checkpoint
-    def initialize(database:, name:)
+    def initialize(database:, name:, event_types: nil)
       @database = database
       @name = name
+      @event_types = event_types
     end
 
     def position
@@ -21,7 +22,7 @@ module PostgresEventStore
         .where(name: @name)
         .update(position: position)
       if rows_affected == 0
-        checkpoints.insert(name: @name, position: position)
+        checkpoints.insert(name: @name, position: position, event_types: Sequel.pg_array(@event_types))
       end
     end
 

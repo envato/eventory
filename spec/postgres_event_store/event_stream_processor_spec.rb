@@ -36,7 +36,8 @@ RSpec.describe PostgresEventStore::EventStreamProcessor do
     allow(checkpoint_double).to receive(:transaction).and_yield
     allow(checkpoint_double).to receive(:save_position)
     allow(checkpoints).to receive(:checkout)
-      .with('test-esp').and_return(checkpoint_double)
+      .with(processor_name: 'test-esp',
+            event_types: ['ItemAdded', 'ItemRemoved']).and_return(checkpoint_double)
     checkpoint_double
   end
 
@@ -49,7 +50,7 @@ RSpec.describe PostgresEventStore::EventStreamProcessor do
 
     it 'saves the last processed event number with checkpoint' do
       esp.process(item_added)
-      expect(checkpoints.checkout('test-esp').position).to eq 1
+      expect(checkpoints.checkout(processor_name: 'test-esp').position).to eq 1
     end
 
     it 'wraps event processing in a transaction with checkpoint' do

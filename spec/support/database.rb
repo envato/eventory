@@ -11,6 +11,8 @@ module DatabaseHelpers
     db = Sequel.connect(adapter: 'postgres',
                          host: '127.0.0.1',
                          database: 'postgres_event_store_test')
+    Sequel.extension(:pg_array_ops)
+    db.extension(:pg_array)
     db.extension(:pg_json)
     db.logger = Logger.new(STDOUT) if ENV['LOG']
     db

@@ -5,7 +5,7 @@ module PostgresEventStore
 
     def initialize(event_store:, checkpoints:)
       @event_store = event_store
-      @checkpoint = checkpoints.checkout(processor_name)
+      @checkpoint = checkpoints.checkout(processor_name: processor_name, event_types: self.class.handled_event_classes.map(&:to_s))
     end
 
     DEFAULT_SUBSCRIPTION_ARGS = {

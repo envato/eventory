@@ -24,6 +24,7 @@ CREATE RULE no_delete_event_counter AS ON DELETE TO event_counter DO INSTEAD NOT
 CREATE TABLE checkpoints (
   id SERIAL PRIMARY KEY NOT NULL,
   name VARCHAR(255) NOT NULL,
+  event_types VARCHAR(255)[] DEFAULT NULL,
   position BIGINT NOT NULL,
   created_at timestamp with time zone DEFAULT now() NOT NULL
 );

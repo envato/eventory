@@ -6,10 +6,11 @@ module PostgresEventStore
 
     # TODO: ensure only one processor can checkout a checkpoint.
     # Use a row level lock / for update?
-    def checkout(processor)
+    def checkout(processor_name:, event_types: nil)
       Checkpoint.new(
         database: @database,
-        name: processor.to_s
+        name: processor_name,
+        event_types: event_types
       )
     end
   end
