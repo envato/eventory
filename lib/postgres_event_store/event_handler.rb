@@ -22,9 +22,15 @@ module PostgresEventStore
 
     def handle(recorded_events)
       Array(recorded_events).each do |recorded_event|
-        self.class.event_handlers[recorded_event.event_type_class].each do |handler|
-          instance_exec(recorded_event, &handler)
-        end
+        handle_event(recorded_event)
+      end
+    end
+
+    private
+
+    def handle_event(recorded_event)
+      self.class.event_handlers[recorded_event.event_type_class].each do |handler|
+        instance_exec(recorded_event, &handler)
       end
     end
   end
