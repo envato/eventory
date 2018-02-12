@@ -7,3 +7,6 @@ class ItemRemoved < PostgresEventStore::Event
   attribute :item_id
 end
 
+class ItemStarred < PostgresEventStore::Event
+  attribute :item_id
+end
