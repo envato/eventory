@@ -10,6 +10,7 @@ require 'postgres_event_store/checkpoints'
 require 'postgres_event_store/checkpoint'
 require 'postgres_event_store/event_handler'
 require 'postgres_event_store/event_builder'
+require 'postgres_event_store/event_stream_processor'
 
 module PostgresEventStore
 end
