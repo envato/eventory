@@ -16,10 +16,10 @@ module PostgresEventStore
       end
     end
 
-    def handle(events)
-      Array(events).each do |event|
-        self.class.event_handlers[event.class].each do |handler|
-          instance_exec(event, &handler)
+    def handle(recorded_events)
+      Array(recorded_events).each do |recorded_event|
+        self.class.event_handlers[recorded_event.event_type_class].each do |handler|
+          instance_exec(recorded_event, &handler)
         end
       end
     end
