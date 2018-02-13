@@ -1,20 +1,20 @@
 module Eventory
   class Event
     def self.attribute(name)
-      attributes[name.to_sym] = 1
+      attributes << name.to_sym
       attr_reader name
     end
 
     class << self
       def attributes
-        @attributes ||= {}
+        @attributes ||= []
       end
     end
 
     def initialize(event_data)
-      @event_data = Hash[event_data.map { |k, v| [k.to_sym, v] }]
-      self.class.attributes.each_key do |attribute|
-        instance_variable_set("@#{attribute}", @event_data[attribute])
+      event_data = Hash[event_data.map { |k, v| [k.to_sym, v] }]
+      self.class.attributes.each do |attribute|
+        instance_variable_set("@#{attribute}", event_data[attribute])
       end
     end
 
@@ -27,7 +27,7 @@ module Eventory
     end
 
     def attributes
-      self.class.attributes.keys.each_with_object({}) do |key, hash|
+      self.class.attributes.each_with_object({}) do |key, hash|
         hash[key] = instance_variable_get("@#{key}")
       end
     end
