@@ -1,4 +1,4 @@
-RSpec.describe PostgresEventStore::Event do
+RSpec.describe Eventory::Event do
   let(:event) { ItemAdded.new(item_id: 1, name: 'test') }
 
   it 'exposes attributes with accessors' do

@@ -1,5 +1,5 @@
 class TestHandler
-  include PostgresEventStore::EventHandler
+  include Eventory::EventHandler
 
   def initialize
     @added = []
@@ -17,7 +17,7 @@ class TestHandler
   attr_accessor :added, :removed
 end
 
-RSpec.describe PostgresEventStore::EventHandler do
+RSpec.describe Eventory::EventHandler do
   subject(:event_handler) { TestHandler.new }
   let(:item_added) { recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 1, name: 'Test!')) }
   let(:item_removed) { recorded_event(type: 'ItemRemoved', data: ItemRemoved.new(item_id: 1)) }

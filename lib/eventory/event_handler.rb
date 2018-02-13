@@ -1,4 +1,4 @@
-module PostgresEventStore
+module Eventory
   module EventHandler
     def self.included(base)
       base.extend(ClassMethods)

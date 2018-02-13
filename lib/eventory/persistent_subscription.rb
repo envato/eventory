@@ -1,4 +1,4 @@
-module PostgresEventStore
+module Eventory
   class PersistentSubscription
     def initialize(event_store:, checkpoint:, event_types: nil, batch_size: 1000, sleep: 0.5)
       @checkpoint = checkpoint

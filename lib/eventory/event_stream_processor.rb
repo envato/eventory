@@ -1,4 +1,4 @@
-module PostgresEventStore
+module Eventory
   class EventStreamProcessor
     include EventHandler
     private :handle

@@ -1,4 +1,4 @@
-module PostgresEventStore
+module Eventory
   ConcurrencyError = Class.new(StandardError)
 
   class EventStore

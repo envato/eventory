@@ -1,17 +1,17 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "postgres_event_store/version"
+require "eventory/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "postgres_event_store"
-  spec.version       = PostgresEventStore::VERSION
+  spec.name          = "eventory"
+  spec.version       = Eventory::VERSION
   spec.authors       = ["Steve Hodgkiss"]
   spec.email         = ["steve@hodgkiss.me"]
 
   spec.summary       = %q{Postgres Event Store}
   spec.description   = %q{}
-  spec.homepage      = "https://github.com/envato/postgres_event_store"
+  spec.homepage      = "https://github.com/envato/eventory"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'

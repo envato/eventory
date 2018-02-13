@@ -1,13 +1,13 @@
-class ItemAdded < PostgresEventStore::Event
+class ItemAdded < Eventory::Event
   attribute :item_id
   attribute :name
 end
 
-class ItemRemoved < PostgresEventStore::Event
+class ItemRemoved < Eventory::Event
   attribute :item_id
 end
 
-class ItemStarred < PostgresEventStore::Event
+class ItemStarred < Eventory::Event
   attribute :item_id
 end
 
@@ -19,7 +19,7 @@ module EventHelpers
                      data: {},
                      recorded_at: Time.now.utc)
     @number ||= 0
-    PostgresEventStore::RecordedEvent.new(
+    Eventory::RecordedEvent.new(
       number: @number += 1,
       id: id,
       stream_id: stream_id,

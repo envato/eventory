@@ -1,4 +1,4 @@
-module PostgresEventStore
+module Eventory
   class Subscription
     def initialize(event_store:,
                    from_event_number:,

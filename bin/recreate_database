@@ -3,6 +3,6 @@ set -euo pipefail
 IFS=$'\n\t'
 set -vx
 
-dropdb postgres_event_store_test || echo 'database did not exist'
-createdb postgres_event_store_test
-psql -d postgres_event_store_test -f schema.sql
+dropdb eventory_test || echo 'database did not exist'
+createdb eventory_test
+psql -d eventory_test -f schema.sql

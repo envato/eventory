@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    postgres_event_store (0.1.0)
+    eventory (0.1.0)
       pg
       sequel (~> 5.5)
 
@@ -38,7 +38,7 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.16)
   database_cleaner
-  postgres_event_store!
+  eventory!
   pry
   rake (~> 10.0)
   rspec (~> 3.0)

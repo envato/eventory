@@ -1,8 +1,8 @@
-RSpec.describe PostgresEventStore::Subscription do
+RSpec.describe Eventory::Subscription do
   subject(:subscription) { described_class.new(event_store: event_store, from_event_number: from_event_number, event_types: ['test']) }
   let(:from_event_number) { 0 }
-  let(:event_store) { instance_double(PostgresEventStore::EventStore) }
-  let(:events) { [instance_double(PostgresEventStore::RecordedEvent, number: 1)] }
+  let(:event_store) { instance_double(Eventory::EventStore) }
+  let(:events) { [instance_double(Eventory::RecordedEvent, number: 1)] }
 
   it 'reads new events from the starting position then from the last event number + 1' do
     allow(event_store).to receive(:read_all_events_from)
