@@ -86,7 +86,7 @@ RSpec.describe Eventory::EventStore do
       expect(event[:causation_id]).to eq cid
     end
 
-    it "doesn't increment the number number if the transaction is aborted" do
+    it "doesn't increment the event number if the transaction is aborted" do
       tmp_db = DatabaseHelpers.connect_database
       long_type_name = 't' * 256
       begin
