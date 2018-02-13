@@ -20,6 +20,7 @@ module PostgresEventStore
           stream_version += 1
           number += 1
         end
+        # TODO: notify new event
       end
     end
 

@@ -9,6 +9,8 @@ module PostgresEventStore
       @from_event_number = from_event_number
       @event_types = event_types
       @batch_size = batch_size
+      # TODO: use notify when saving events and listen here to react to
+      # that, rather than poll
       @sleep = sleep
     end
 
