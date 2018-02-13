@@ -11,6 +11,8 @@ require 'postgres_event_store/checkpoint'
 require 'postgres_event_store/event_handler'
 require 'postgres_event_store/event_builder'
 require 'postgres_event_store/event_stream_processor'
+require 'postgres_event_store/projector'
+require 'postgres_event_store/projection'
 
 module PostgresEventStore
 end
