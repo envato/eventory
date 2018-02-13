@@ -3,14 +3,18 @@ module Eventory
     include EventHandler
     include SchemaOwner
 
-    def initialize(event_store:, checkpoints:, database:, namespace: nil)
+    def initialize(event_store:, checkpoints:, database:, version: nil)
       @database = database
-      @namespace = namespace
+      @version = version
       super(event_store: event_store, checkpoints: checkpoints)
     end
 
     private
 
-    attr_reader :database, :namespace
+    attr_reader :database, :version
+
+    def namespace
+      [processor_name, version].compact.join('_')
+    end
   end
 end
