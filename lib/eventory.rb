@@ -11,7 +11,8 @@ require 'eventory/checkpoint'
 require 'eventory/event_handler'
 require 'eventory/event_builder'
 require 'eventory/event_stream_processor'
-require 'eventory/projection'
+require 'eventory/schema_owner'
+require 'eventory/projector'
 
 module Eventory
 end

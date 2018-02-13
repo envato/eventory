@@ -1,13 +1,10 @@
 module Eventory
-  class Projection
-    include EventHandler
-
-    def initialize(database:, namespace: nil)
-      @database = database
-      @namespace = namespace
+  module SchemaOwner
+    def self.included(base)
+      base.extend(ClassMethods)
     end
 
-    class << self
+    module ClassMethods
       def tables
         @tables ||= {}
       end
@@ -31,14 +28,16 @@ module Eventory
 
     private
 
-    attr_reader :database, :namespace
-
     def table(name)
       database[namespaced_name(name)]
     end
 
     def namespaced_name(name)
       [namespace, name].compact.join('_').to_sym
+    end
+
+    def namespace
+      # implement in subclass
     end
   end
 end
