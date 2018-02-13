@@ -7,7 +7,7 @@ CREATE TABLE events (
   stream_version BIGINT NOT NULL,
   type VARCHAR(255) NOT NULL,
   data jsonb NOT NULL,
-  recorded_at timestamp with time zone DEFAULT now() NOT NULL,
+  recorded_at timestamp without time zone default (now() at time zone 'utc') NOT NULL,
   correlation_id UUID DEFAULT NULL,
   causation_id UUID DEFAULT NULL,
   metadata JSONB DEFAULT NULL
@@ -29,6 +29,6 @@ CREATE TABLE checkpoints (
   name VARCHAR(255) NOT NULL,
   event_types VARCHAR(255)[] DEFAULT NULL,
   position BIGINT NOT NULL,
-  created_at timestamp with time zone DEFAULT now() NOT NULL
+  created_at timestamp without time zone default (now() at time zone 'utc') NOT NULL
 );
 CREATE INDEX checkpoints_name ON checkpoints (name);
