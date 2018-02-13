@@ -5,16 +5,14 @@ module Eventory
       attr_reader name
     end
 
-    class << self
-      def attributes
-        @attributes ||= []
-      end
+    def self.attributes
+      @attributes ||= []
     end
 
     def initialize(event_data)
-      event_data = Hash[event_data.map { |k, v| [k.to_sym, v] }]
+      event_data_with_symbol_keys = Hash[event_data.map { |k, v| [k.to_sym, v] }]
       self.class.attributes.each do |attribute|
-        instance_variable_set("@#{attribute}", event_data[attribute])
+        instance_variable_set("@#{attribute}", event_data_with_symbol_keys[attribute])
       end
     end
 
