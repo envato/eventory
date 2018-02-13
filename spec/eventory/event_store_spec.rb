@@ -1,11 +1,11 @@
-RSpec.describe PostgresEventStore::EventStore do
+RSpec.describe Eventory::EventStore do
   subject(:event_store) { described_class.new(database: database) }
   let(:stream_id) { SecureRandom.uuid }
 
   describe '#save' do
     it 'saves an event' do
       event_id = SecureRandom.uuid
-      event_store.save(stream_id, PostgresEventStore::EventData.new(type: 'test', data: { a: 'b' }, id: event_id))
+      event_store.save(stream_id, Eventory::EventData.new(type: 'test', data: { a: 'b' }, id: event_id))
       events = database[:events].all
       expect(events.count).to eq 1
       event = events[0]
@@ -46,7 +46,7 @@ RSpec.describe PostgresEventStore::EventStore do
     end
 
     it 'saves multiple events' do
-      event_store.save(stream_id, [PostgresEventStore::EventData.new(type: 'test', data: {a: 'b'}), PostgresEventStore::EventData.new(type: 'test2', data: {c: 'd'})])
+      event_store.save(stream_id, [Eventory::EventData.new(type: 'test', data: {a: 'b'}), Eventory::EventData.new(type: 'test2', data: {c: 'd'})])
       events = database[:events].all
       expect(events.count).to eq 2
       event_1 = events[0]
@@ -75,11 +75,11 @@ RSpec.describe PostgresEventStore::EventStore do
       long_type_name = 't' * 256
       begin
         expect {
-          PostgresEventStore::EventStore.new(database: tmp_db)
-            .save(stream_id, PostgresEventStore::EventData.new(type: long_type_name, data: {}))
+          Eventory::EventStore.new(database: tmp_db)
+            .save(stream_id, Eventory::EventData.new(type: long_type_name, data: {}))
         }.to raise_error(Sequel::DatabaseError)
         expect(database[:events].count).to eq 0
-        event_store.save(stream_id, PostgresEventStore::EventData.new(type: 'test', data: {}))
+        event_store.save(stream_id, Eventory::EventData.new(type: 'test', data: {}))
         expect(database[:events].map {|e| e[:number]}).to eq([1])
       ensure
         tmp_db.disconnect
@@ -87,8 +87,8 @@ RSpec.describe PostgresEventStore::EventStore do
     end
 
     context 'optimistic locking' do
-      let(:event) { PostgresEventStore::EventData.new(type: 'test', data: { a: 'b' }) }
-      let(:event_2) { PostgresEventStore::EventData.new(type: 'test', data: { a: 'c' }) }
+      let(:event) { Eventory::EventData.new(type: 'test', data: { a: 'b' }) }
+      let(:event_2) { Eventory::EventData.new(type: 'test', data: { a: 'c' }) }
 
       context "when the stream doesn't exist" do
         it 'saves the event if the version is correct' do
@@ -98,7 +98,7 @@ RSpec.describe PostgresEventStore::EventStore do
         it 'raises a concurrency error if the version is incorrect' do
           expect {
             event_store.save(stream_id, event, expected_version: 1)
-          }.to raise_error(PostgresEventStore::ConcurrencyError)
+          }.to raise_error(Eventory::ConcurrencyError)
         end
       end
 
@@ -112,14 +112,14 @@ RSpec.describe PostgresEventStore::EventStore do
         it 'raises a concurrency error if the version is incorrect' do
           expect {
             event_store.save(stream_id, event, expected_version: 2)
-          }.to raise_error(PostgresEventStore::ConcurrencyError)
+          }.to raise_error(Eventory::ConcurrencyError)
         end
       end
     end
   end
 
   context 'reading events' do
-    let(:event) { PostgresEventStore::EventData.new(type: 'test', data: { a: 'b' }, id: SecureRandom.uuid) }
+    let(:event) { Eventory::EventData.new(type: 'test', data: { a: 'b' }, id: SecureRandom.uuid) }
     let(:event_2) { ItemRemoved.new(item_id: 1) }
     let(:event_3) { ItemAdded.new(item_id: 1, name: 'Test') }
     let(:stream_id_2) { SecureRandom.uuid }

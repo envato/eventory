@@ -1,4 +1,4 @@
-module PostgresEventStore
+module Eventory
   class Checkpoint
     def initialize(database:, name:, event_types: nil)
       @database = database

@@ -1,4 +1,4 @@
-module PostgresEventStore
+module Eventory
   class RecordedEvent
     attr_reader :number,
                 :stream_id,

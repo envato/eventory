@@ -1,5 +1,5 @@
 require "bundler/setup"
-require "postgres_event_store"
+require "eventory"
 require 'pry'
 require 'securerandom'
 

@@ -1,6 +1,6 @@
-RSpec.describe PostgresEventStore::Checkpoint do
-  let(:checkpoint_1) { PostgresEventStore::Checkpoint.new(database: database, name: 'name-1') }
-  let(:checkpoint_2) { PostgresEventStore::Checkpoint.new(database: database, name: 'name-2', event_types: ['test']) }
+RSpec.describe Eventory::Checkpoint do
+  let(:checkpoint_1) { Eventory::Checkpoint.new(database: database, name: 'name-1') }
+  let(:checkpoint_2) { Eventory::Checkpoint.new(database: database, name: 'name-2', event_types: ['test']) }
 
   it "defaults to 0 when a checkpoint isn't saved" do
     expect(checkpoint_1.position).to eq 0

@@ -1,4 +1,4 @@
-# PostgresEventStore
+# Eventory
 
 A simple event store with Postgres as a backend.
 

@@ -1,4 +1,4 @@
-module PostgresEventStore
+module Eventory
   class EventData
     def initialize(id: SecureRandom.uuid,
                    type:,

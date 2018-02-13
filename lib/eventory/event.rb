@@ -1,4 +1,4 @@
-module PostgresEventStore
+module Eventory
   class Event
     def self.attribute(name)
       attributes[name.to_sym] = 1

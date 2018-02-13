@@ -1,4 +1,4 @@
-class TestESP < PostgresEventStore::EventStreamProcessor
+class TestESP < Eventory::EventStreamProcessor
   subscription_options processor_name: 'test-esp',
                        batch_size: 10_000,
                        sleep: 1
@@ -20,19 +20,19 @@ class TestESP < PostgresEventStore::EventStreamProcessor
   attr_reader :added, :removed
 end
 
-class TestESP2 < PostgresEventStore::EventStreamProcessor
+class TestESP2 < Eventory::EventStreamProcessor
 end
 
-RSpec.describe PostgresEventStore::EventStreamProcessor do
+RSpec.describe Eventory::EventStreamProcessor do
   subject(:esp) { TestESP.new(event_store: event_store, checkpoints: checkpoints) }
-  let(:event_store) { PostgresEventStore::EventStore.new(database: database) }
-  let(:checkpoints) { PostgresEventStore::Checkpoints.new(database: database) }
+  let(:event_store) { Eventory::EventStore.new(database: database) }
+  let(:checkpoints) { Eventory::Checkpoints.new(database: database) }
   let(:item_added) { recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 1, name: 'test')) }
   let(:item_removed) { recorded_event(type: 'ItemRemoved', data: ItemRemoved.new(item_id: 1)) }
   let(:esp2) { esp = TestESP2.new(event_store: event_store, checkpoints: checkpoints) }
 
   def stub_checkpoint
-    checkpoint_double = instance_double(PostgresEventStore::Checkpoint)
+    checkpoint_double = instance_double(Eventory::Checkpoint)
     allow(checkpoint_double).to receive(:transaction).and_yield
     allow(checkpoint_double).to receive(:save_position)
     allow(checkpoints).to receive(:checkout)
@@ -124,11 +124,11 @@ RSpec.describe PostgresEventStore::EventStreamProcessor do
 
   describe '#start' do
     it 'starts a subscription with correct args' do
-      subscription = instance_double(PostgresEventStore::Subscription)
-      allow(PostgresEventStore::Subscription).to receive(:new).and_return(subscription)
+      subscription = instance_double(Eventory::Subscription)
+      allow(Eventory::Subscription).to receive(:new).and_return(subscription)
       allow(subscription).to receive(:start).and_yield([])
       esp.start
-      expect(PostgresEventStore::Subscription).to have_received(:new).with(
+      expect(Eventory::Subscription).to have_received(:new).with(
         event_store: event_store,
         from_event_number: 1,
         event_types: ['ItemAdded', 'ItemRemoved'],

@@ -1,4 +1,4 @@
-module PostgresEventStore
+module Eventory
   class EventBuilder
     def build(type:, data:)
       klass = resolve_type(type)
