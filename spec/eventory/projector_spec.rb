@@ -1,4 +1,4 @@
-class TestProjection < Eventory::Projection
+class TestProjector < Eventory::Projector
   table :test_table do
     column :sequence_id, 'SERIAL PRIMARY KEY', unique: true
     column :item_id, 'INT NOT NULL'
@@ -9,8 +9,8 @@ class TestProjection < Eventory::Projection
   end
 end
 
-RSpec.describe Eventory::Projection do
-  subject(:test_projector) { TestProjection.new(event_store: event_store, checkpoints: checkpoints, database: database, namespace: namespace) }
+RSpec.describe Eventory::Projector do
+  subject(:test_projector) { TestProjector.new(event_store: event_store, checkpoints: checkpoints, database: database, namespace: namespace) }
   let(:event_store) { Eventory::EventStore.new(database: database) }
   let(:checkpoints) { Eventory::Checkpoints.new(database: database) }
   let(:namespace) { 'ns' }
@@ -35,7 +35,7 @@ RSpec.describe Eventory::Projection do
   end
 
   it 'tracks positions' do
-    checkpoint = checkpoints.checkout(processor_name: 'TestProjection')
+    checkpoint = checkpoints.checkout(processor_name: 'TestProjector')
     test_projector.up
     test_projector.process(recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 1)))
     expect(checkpoint.position).to eq 1

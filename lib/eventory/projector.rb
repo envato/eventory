@@ -1,5 +1,5 @@
 module Eventory
-  class Projection < EventStreamProcessor
+  class Projector < EventStreamProcessor
     include EventHandler
     include SchemaOwner
 
