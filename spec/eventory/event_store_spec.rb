@@ -86,6 +86,14 @@ RSpec.describe Eventory::EventStore do
       expect(event[:causation_id]).to eq cid
     end
 
+    it 'saves events with metadata' do
+      cid = SecureRandom.uuid
+      event_store.save(stream_id, ItemRemoved.new(item_id: 1).to_event_data(metadata: { git_sha: '82e5e57' }))
+      event = database[:events].all.last
+      expect(event).to_not be_nil
+      expect(event[:metadata]).to eq('git_sha' => '82e5e57')
+    end
+
     it "doesn't increment the event number if the transaction is aborted" do
       tmp_db = DatabaseHelpers.connect_database
       long_type_name = 't' * 256

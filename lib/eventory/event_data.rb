@@ -4,15 +4,17 @@ module Eventory
                    type:,
                    data:,
                    correlation_id: nil,
-                   causation_id: nil)
+                   causation_id: nil,
+                   metadata: nil)
       @id = id
       @type = type
       @data = data
       @correlation_id = correlation_id
       @causation_id = causation_id
+      @metadata = metadata
     end
 
-    attr_reader :id, :type, :data, :correlation_id, :causation_id
+    attr_reader :id, :type, :data, :correlation_id, :causation_id, :metadata
 
     def to_event_data
       self

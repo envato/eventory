@@ -9,7 +9,8 @@ CREATE TABLE events (
   data jsonb NOT NULL,
   recorded_at timestamp with time zone DEFAULT now() NOT NULL,
   correlation_id UUID DEFAULT NULL,
-  causation_id UUID DEFAULT NULL
+  causation_id UUID DEFAULT NULL,
+  metadata JSONB DEFAULT NULL
 );
 
 CREATE UNIQUE INDEX events_number_index ON events USING btree (number);
