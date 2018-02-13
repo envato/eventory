@@ -16,6 +16,8 @@ CREATE TABLE events (
 CREATE UNIQUE INDEX events_number_index ON events (number);
 CREATE INDEX events_stream_id_index ON events (stream_id);
 CREATE INDEX events_recorded_at_index ON events (recorded_at);
+CREATE INDEX events_correlation_id_index ON events (correlation_id);
+CREATE INDEX events_causation_id_index ON events (causation_id);
 
 CREATE TABLE event_counter (
   number INT
