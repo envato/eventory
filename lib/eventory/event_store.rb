@@ -72,7 +72,10 @@ module Eventory
         stream_version: row.fetch(:stream_version),
         type: row.fetch(:type),
         data: event,
-        recorded_at: row.fetch(:recorded_at)
+        recorded_at: row.fetch(:recorded_at),
+        correlation_id: row.fetch(:correlation_id),
+        causation_id: row.fetch(:causation_id),
+        metadata: row.fetch(:metadata)&.to_h
       )
     end
 
