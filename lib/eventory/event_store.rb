@@ -56,7 +56,7 @@ module Eventory
       high_number - event_count + 1
     end
 
-    # Update and return the starting stream version number
+    # Return the starting stream version number
     #
     # @return Integer the starting stream version number
     def stream_version(stream_id)
