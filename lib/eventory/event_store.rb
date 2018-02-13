@@ -83,7 +83,9 @@ module Eventory
         stream_version: stream_version,
         id: event_data.id,
         type: event_data.type,
-        data: Sequel.pg_jsonb(event_data.data)
+        data: Sequel.pg_jsonb(event_data.data),
+        correlation_id: event_data.correlation_id,
+        causation_id: event_data.causation_id
       )
     end
   end

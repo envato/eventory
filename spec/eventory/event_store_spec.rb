@@ -70,6 +70,22 @@ RSpec.describe Eventory::EventStore do
       end
     end
 
+    it 'saves events with correlation_id' do
+      cid = SecureRandom.uuid
+      event_store.save(stream_id, ItemRemoved.new(item_id: 1).to_event_data(correlation_id: cid))
+      event = database[:events].all.last
+      expect(event).to_not be_nil
+      expect(event[:correlation_id]).to eq cid
+    end
+
+    it 'saves events with causation_id' do
+      cid = SecureRandom.uuid
+      event_store.save(stream_id, ItemRemoved.new(item_id: 1).to_event_data(causation_id: cid))
+      event = database[:events].all.last
+      expect(event).to_not be_nil
+      expect(event[:causation_id]).to eq cid
+    end
+
     it "doesn't increment the number number if the transaction is aborted" do
       tmp_db = DatabaseHelpers.connect_database
       long_type_name = 't' * 256
