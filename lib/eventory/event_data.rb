@@ -5,7 +5,7 @@ module Eventory
                    data:,
                    correlation_id: nil,
                    causation_id: nil,
-                   metadata: nil)
+                   metadata: {})
       @id = id
       @type = type
       @data = data
@@ -21,4 +21,3 @@ module Eventory
     end
   end
 end
-

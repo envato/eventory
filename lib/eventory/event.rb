@@ -16,7 +16,7 @@ module Eventory
       end
     end
 
-    def to_event_data(correlation_id: nil, causation_id: nil, metadata: nil)
+    def to_event_data(correlation_id: nil, causation_id: nil, metadata: {})
       EventData.new(type: self.class.name,
                     data: attributes,
                     correlation_id: correlation_id,

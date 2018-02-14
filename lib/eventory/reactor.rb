@@ -12,7 +12,7 @@ module Eventory
     end
 
     def build_event_metadata
-      nil
+      {}
     end
   end
 end

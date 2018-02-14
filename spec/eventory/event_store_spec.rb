@@ -90,7 +90,7 @@ RSpec.describe Eventory::EventStore do
       event_store.save(stream_id, ItemRemoved.new(item_id: 1))
       event = database[:events].all.last
       expect(event).to_not be_nil
-      expect(event[:metadata]).to eq nil
+      expect(event[:metadata]).to eq({})
     end
 
     it 'saves events with metadata' do

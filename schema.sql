@@ -10,7 +10,7 @@ CREATE TABLE events (
   recorded_at timestamp without time zone default (now() at time zone 'utc') NOT NULL,
   correlation_id UUID DEFAULT NULL,
   causation_id UUID DEFAULT NULL,
-  metadata JSONB DEFAULT NULL
+  metadata JSONB NOT NULL DEFAULT '{}'
 );
 
 CREATE UNIQUE INDEX events_number_index ON events (number);
