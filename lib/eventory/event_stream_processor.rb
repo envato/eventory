@@ -27,6 +27,7 @@ module Eventory
                                   sleep: nil,
                                   checkpoint_after: nil,
                                   checkpoint_transaction: nil)
+      raise ArgumentError, 'unsupported checkpoint_after value - specify :batch or :event' unless checkpoint_after.nil? || %i[ batch event ].include?(checkpoint_after)
       subscription_args.merge!({ processor_name: processor_name,
                                  batch_size: batch_size,
                                  sleep: sleep,

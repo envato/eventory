@@ -137,4 +137,10 @@ RSpec.describe Eventory::EventStreamProcessor do
       )
     end
   end
+
+  it 'raises given an invalid checkpoint_after value' do
+    expect {
+      TestESP.subscription_options(checkpoint_after: :something)
+    }.to raise_error(ArgumentError)
+  end
 end
