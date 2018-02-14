@@ -20,8 +20,9 @@ CREATE INDEX events_correlation_id_index ON events (correlation_id);
 CREATE INDEX events_causation_id_index ON events (causation_id);
 
 CREATE TABLE event_counter (
-  number INT
+  number BIGINT PRIMARY KEY NOT NULL
 );
+CREATE UNIQUE INDEX event_counter_number on event_counter (number);
 INSERT INTO event_counter (number) VALUES (0);
 CREATE RULE no_insert_event_counter AS ON INSERT TO event_counter DO INSTEAD NOTHING;
 CREATE RULE no_delete_event_counter AS ON DELETE TO event_counter DO INSTEAD NOTHING;
