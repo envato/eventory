@@ -9,18 +9,12 @@ module Eventory
 
     def save(stream_id, events, expected_version: nil)
       events = Array(events)
-      event_count = events.count
-      database.transaction do
-        number = claim_next_event_sequence_numbers(event_count)
-        stream_version = stream_version(stream_id)
-        raise ConcurrencyError if expected_version && expected_version != stream_version
-        stream_version += 1
-        events.each do |event|
-          insert_event(number, stream_id, stream_version, event.to_event_data)
-          stream_version += 1
-          number += 1
-        end
-        # TODO: notify new event
+      database.run write_events_sql(stream_id, events.map(&:to_event_data), expected_version)
+    rescue Sequel::DatabaseError => e
+      if e.message =~ /Concurrency conflict/
+        raise ConcurrencyError, "expected version was not #{expected_version}. Error: #{e.message}"
+      else
+        raise
       end
     end
 
@@ -45,24 +39,6 @@ module Eventory
 
     attr_reader :database
 
-    # Claim the next `event_count` number numbers
-    #
-    # This also places a row level rock on the single event counter row,
-    # effectively serialising event inserts.
-    #
-    # @return Integer the starting event number number
-    def claim_next_event_sequence_numbers(event_count)
-      high_number = database[:event_counter].returning(:number).update(Sequel.lit("number = number + #{event_count}")).first[:number]
-      high_number - event_count + 1
-    end
-
-    # Return the starting stream version number
-    #
-    # @return Integer the starting stream version number
-    def stream_version(stream_id)
-      database[:events].where(stream_id: stream_id).max(:stream_version) || 0
-    end
-
     def build_recorded_event(row)
       event = @event_builder.build(type: row.fetch(:type), data: row.fetch(:data).to_h)
       RecordedEvent.new(
@@ -79,26 +55,47 @@ module Eventory
       )
     end
 
-    def insert_event(number, stream_id, stream_version, event_data)
-      database[:events].insert(
-        number: number,
-        stream_id: stream_id,
-        stream_version: stream_version,
-        id: event_data.id,
-        type: event_data.type,
-        data: sequel_jsonb(event_data.data),
-        correlation_id: event_data.correlation_id,
-        causation_id: event_data.causation_id,
-        metadata: sequel_jsonb(event_data.metadata)
-      )
+    def write_events_sql(stream_id, events, expected_version)
+      datas = sql_literal_array(events, 'jsonb', &:data)
+      types = sql_literal_array(events, 'varchar', &:type)
+      event_ids = sql_literal_array(events, 'uuid', &:id)
+      correlation_ids = sql_literal_array(events, 'uuid', &:correlation_id)
+      causation_ids = sql_literal_array(events, 'uuid', &:causation_id)
+      metadata = sql_literal_array(events, 'jsonb', &:metadata)
+      sql = <<-SQL
+        select write_events(
+          #{sql_literal(stream_id, 'uuid')},
+          #{sql_literal(expected_version, 'int')},
+          #{event_ids},
+          #{types},
+          #{datas},
+          #{correlation_ids},
+          #{causation_ids},
+          #{metadata}
+        );
+      SQL
+      sql
     end
 
-    def sequel_jsonb(data)
-      if data
-        Sequel.pg_jsonb(data)
-      else
-        nil
-      end
+    def sql_literal_array(events, type, &block)
+      sql_array = events.map do |event|
+        to_sql_literal(block.call(event))
+      end.join(', ')
+      "array[#{sql_array}]::#{type}[]"
+    end
+
+    def sql_literal(value, type)
+      "#{to_sql_literal(value)}::#{type}"
+    end
+
+    def to_sql_literal(value)
+      return 'null' unless value
+      wrapped_value = if Hash === value
+                        Sequel.pg_jsonb(value)
+                      else
+                        value
+                      end
+      database.literal(wrapped_value)
     end
   end
 end

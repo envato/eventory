@@ -11,7 +11,7 @@ db.extension(:pg_json)
 db.logger = Logger.new(STDOUT) if ENV['LOG']
 
 db.run 'truncate table events'
-#db.run 'update event_counter set number = 0'
+db.run 'update event_counter set number = 0'
 
 event_store = Eventory::EventStore.new(database: db)
 
