@@ -7,7 +7,7 @@ module Eventory
       @event_builder = event_builder
     end
 
-    def save(stream_id, events, expected_version: nil)
+    def append(stream_id, events, expected_version: nil)
       events = Array(events)
       database.run write_events_sql(stream_id, events.map(&:to_event_data), expected_version)
     rescue Sequel::DatabaseError => e

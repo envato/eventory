@@ -3,7 +3,7 @@ class TestReactor < Eventory::Reactor
 
   on ItemAdded do |recorded_event|
     added << recorded_event
-    save_event(recorded_event.stream_id, ItemRemoved.new(item_id: recorded_event.data.item_id))
+    append_event(recorded_event.stream_id, ItemRemoved.new(item_id: recorded_event.data.item_id))
   end
 
   def added
