@@ -18,14 +18,14 @@ CREATE INDEX events_recorded_at_index ON events (recorded_at);
 CREATE INDEX events_correlation_id_index ON events (correlation_id);
 CREATE INDEX events_causation_id_index ON events (causation_id);
 
-CREATE FUNCTION write_events (_stream_id uuid,
-                              expected_version int,
-                              event_ids uuid[],
-                              event_types varchar[],
-                              event_datas jsonb[],
-                              correlation_ids uuid[],
-                              causation_ids uuid[],
-                              metadatas jsonb[]) returns void as $$
+CREATE FUNCTION append_events (_stream_id uuid,
+                               expected_version int,
+                               event_ids uuid[],
+                               event_types varchar[],
+                               event_datas jsonb[],
+                               correlation_ids uuid[],
+                               causation_ids uuid[],
+                               metadatas jsonb[]) returns void as $$
 DECLARE
   num_events int;
   current_version bigint;
