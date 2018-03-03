@@ -3,14 +3,14 @@ require 'securerandom'
 require 'benchmark'
 
 db = Sequel.connect(adapter: 'postgres',
-                     host: '127.0.0.1',
-                     database: 'eventory_test')
+                    host: '127.0.0.1',
+                    database: 'eventory_test')
 Sequel.extension(:pg_array_ops)
 db.extension(:pg_array)
 db.extension(:pg_json)
 db.logger = Logger.new(STDOUT) if ENV['LOG']
 
-puts "Resetting data"
+puts 'Resetting data'
 db.run 'truncate table events'
 db.run 'update event_counter set number = 0'
 
@@ -34,7 +34,7 @@ CONCURRENCY.times do
     end
   end
 end
-puts "Done"
+puts 'Done'
 Process.waitall
 end_time = Time.now
 time_taken = end_time - start
