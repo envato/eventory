@@ -9,7 +9,7 @@ module Eventory
 
     def append(stream_id, events, expected_version: nil)
       events = Array(events)
-      database.run write_events_sql(stream_id, events.map(&:to_event_data), expected_version)
+      database.run append_events_sql(stream_id, events.map(&:to_event_data), expected_version)
     rescue Sequel::DatabaseError => e
       if e.message =~ /Concurrency conflict/
         raise ConcurrencyError, "expected version was not #{expected_version}. Error: #{e.message}"
@@ -55,7 +55,7 @@ module Eventory
       )
     end
 
-    def write_events_sql(stream_id, events, expected_version)
+    def append_events_sql(stream_id, events, expected_version)
       datas = sql_literal_array(events, 'jsonb', &:data)
       types = sql_literal_array(events, 'varchar', &:type)
       event_ids = sql_literal_array(events, 'uuid', &:id)
@@ -63,7 +63,7 @@ module Eventory
       causation_ids = sql_literal_array(events, 'uuid', &:causation_id)
       metadata = sql_literal_array(events, 'jsonb', &:metadata)
       sql = <<-SQL
-        select write_events(
+        select append_events(
           #{sql_literal(stream_id, 'uuid')},
           #{sql_literal(expected_version, 'int')},
           #{event_ids},
