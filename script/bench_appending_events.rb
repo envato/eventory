@@ -13,9 +13,6 @@ db.logger = Logger.new(STDOUT) if ENV['LOG']
 puts "Resetting data"
 db.run 'truncate table events'
 db.run 'update event_counter set number = 0'
-puts "Vacuming tables"
-db.run 'VACUUM FULL event_counter'
-db.run 'VACUUM FULL events'
 
 event_store = Eventory::EventStore.new(database: db)
 
