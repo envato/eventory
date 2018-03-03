@@ -27,7 +27,6 @@ RSpec.configure do |config|
 
     DatabaseCleaner[:sequel].db = $db
     DatabaseCleaner[:sequel].clean_with(:truncation, except: %w[ event_counter ])
-    $db[:event_counter].update(number: 0)
   end
 
   config.before(:each) do |example|
