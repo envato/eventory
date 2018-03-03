@@ -29,31 +29,41 @@ CREATE FUNCTION write_events (_stream_id uuid,
 DECLARE
   num_events int;
   current_version bigint;
-  version bigint;
+  _version bigint;
   data jsonb;
   event_number bigint;
   index int;
 BEGIN
   num_events := array_length(event_datas, 1);
 
-  perform pg_advisory_xact_lock(-1);
-  -- execution of code from here is serialized through use of locking above
-  select max(stream_version) into current_version from events where events.stream_id = _stream_id;
+  select version into current_version from streams where streams.id = _stream_id;
   if current_version is null then
     if expected_version is null or expected_version = 0 then
-      version := 1;
+      insert into streams (id, version) values (_stream_id, num_events);
+      _version := 1;
     else
       raise 'Concurrency conflict. Current version: 0, expected version: %', expected_version;
     end if;
   else
-    version := current_version + 1;
-    if expected_version is not null then
-      if expected_version != current_version then
-        raise 'Concurrency conflict. Last known current version: %, expected version: %', current_version, expected_version;
+    if expected_version is null then
+      update streams
+        set version = version + num_events
+        where id = _stream_id
+        returning ("version" - num_events + 1) into _version;
+    else
+      update streams
+        set version = version + num_events
+        where id = _stream_id
+          and version = expected_version
+        returning (streams.version - num_events + 1) into _version;
+      if not found then
+        raise 'Concurrency conflict. Last known expected version: %', expected_version;
       end if;
     end if;
   end if;
 
+  -- perform pg_advisory_xact_lock(-1);
+  -- !execution of code from here is serialized through use of locking above
   index := 1;
   foreach data IN ARRAY(event_datas)
   loop
@@ -65,13 +75,13 @@ BEGIN
         _stream_id,
         event_types[index],
         data,
-        version,
+        _version,
         correlation_ids[index],
         causation_ids[index],
         metadatas[index]
       );
 
-    version := version + 1;
+    _version := _version + 1;
     index := index + 1;
   end loop;
 END
@@ -85,3 +95,11 @@ CREATE TABLE checkpoints (
   created_at timestamp without time zone default (now() at time zone 'utc') NOT NULL
 );
 CREATE INDEX checkpoints_name ON checkpoints (name);
+
+CREATE TABLE streams (
+  id UUID PRIMARY KEY NOT NULL,
+  version BIGINT NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+CREATE UNIQUE INDEX streams_id_version ON streams (id, version);

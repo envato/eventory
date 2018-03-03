@@ -1,6 +1,9 @@
 RSpec.describe Eventory::EventStore do
   subject(:event_store) { described_class.new(database: database) }
   let(:stream_id) { SecureRandom.uuid }
+  before do
+    database.execute("alter sequence events_number_seq restart with 1")
+  end
 
   describe '#save' do
     it 'saves an event' do
@@ -99,22 +102,6 @@ RSpec.describe Eventory::EventStore do
       event = database[:events].all.last
       expect(event).to_not be_nil
       expect(event[:metadata]).to eq('git_sha' => '82e5e57')
-    end
-
-    it "doesn't increment the event number if the transaction is aborted" do
-      tmp_db = DatabaseHelpers.connect_database
-      long_type_name = 't' * 256
-      begin
-        expect {
-          Eventory::EventStore.new(database: tmp_db)
-            .append(stream_id, Eventory::EventData.new(type: long_type_name, data: {}))
-        }.to raise_error(Sequel::DatabaseError)
-        expect(database[:events].count).to eq 0
-        event_store.append(stream_id, Eventory::EventData.new(type: 'test', data: {}))
-        expect(database[:events].map {|e| e[:number]}).to eq([1])
-      ensure
-        tmp_db.disconnect
-      end
     end
 
     context 'optimistic locking' do
