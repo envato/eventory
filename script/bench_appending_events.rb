@@ -10,32 +10,32 @@ db.extension(:pg_array)
 db.extension(:pg_json)
 db.logger = Logger.new(STDOUT) if ENV['LOG']
 
-puts 'Resetting data'
-db.run 'truncate table events'
-
 event_store = Eventory::EventStore.new(database: db)
 
-CONCURRENCY = 10
-TOTAL_EVENTS = 50_000
-EVENTS = TOTAL_EVENTS / CONCURRENCY
-
 stream_ids = 200.times.map { SecureRandom.uuid }
+TOTAL_EVENTS = 50_000
 
-db.disconnect
+(1..50).each do |concurrency|
+  # puts 'Resetting data'
+  db.run 'truncate table events'
 
-print "Forking #{CONCURRENCY} processes... "
-start = Time.now
+  num_events_per_process = TOTAL_EVENTS / concurrency
 
-CONCURRENCY.times do
-  fork do
-    EVENTS.times do
-      event_store.append(stream_ids.sample, Eventory::EventData.new(type: 'test', data: { 'a' => '1' }))
+  db.disconnect
+
+  print "#{concurrency} concurrent processes: "
+  start = Time.now
+
+  concurrency.times do
+    fork do
+      num_events_per_process.times do
+        event_store.append(stream_ids.sample, Eventory::EventData.new(type: 'test', data: { 'a' => '1' }))
+      end
     end
   end
-end
-puts 'Done'
-Process.waitall
-end_time = Time.now
-time_taken = end_time - start
+  Process.waitall
+  end_time = Time.now
+  time_taken = end_time - start
 
-puts "Took #{time_taken} to emit #{EVENTS} from #{CONCURRENCY} processes"
+  puts "took #{time_taken} seconds to emit #{num_events_per_process} from #{concurrency} processes"
+end
