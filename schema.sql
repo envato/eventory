@@ -43,7 +43,8 @@ BEGIN
         insert into streams (id, version)
                      values (_stream_id, 0);
       exception when unique_violation then
-          select version into current_version from streams where streams.id = _stream_id;
+        -- race condition creating stream
+        select version into current_version from streams where streams.id = _stream_id;
       end;
     else
       raise 'Concurrency conflict. Current version: 0, expected version: %', expected_version;
@@ -54,20 +55,20 @@ BEGIN
     update streams
       set version = version + num_events
       where id = _stream_id
-      returning ("version" - num_events + 1) into _version;
+      returning (version - num_events + 1) into _version;
   else
     update streams
       set version = version + num_events
       where id = _stream_id
         and version = expected_version
-      returning (streams.version - num_events + 1) into _version;
+      returning (version - num_events + 1) into _version;
     if not found then
       raise 'Concurrency conflict. Last known expected version: %', expected_version;
     end if;
   end if;
 
-  -- perform pg_advisory_xact_lock(-1);
-  -- !execution of code from here is serialized through use of locking above
+  perform pg_advisory_xact_lock(-1);
+  -- execution of code from here is serialized through use of locking above
   index := 1;
   foreach data IN ARRAY(event_datas)
   loop
