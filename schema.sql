@@ -39,26 +39,30 @@ BEGIN
   select version into current_version from streams where streams.id = _stream_id;
   if current_version is null then
     if expected_version is null or expected_version = 0 then
-      insert into streams (id, version) values (_stream_id, num_events);
-      _version := 1;
+      begin
+        insert into streams (id, version)
+                     values (_stream_id, 0);
+      exception when unique_violation then
+          select version into current_version from streams where streams.id = _stream_id;
+      end;
     else
       raise 'Concurrency conflict. Current version: 0, expected version: %', expected_version;
     end if;
+  end if;
+
+  if expected_version is null then
+    update streams
+      set version = version + num_events
+      where id = _stream_id
+      returning ("version" - num_events + 1) into _version;
   else
-    if expected_version is null then
-      update streams
-        set version = version + num_events
-        where id = _stream_id
-        returning ("version" - num_events + 1) into _version;
-    else
-      update streams
-        set version = version + num_events
-        where id = _stream_id
-          and version = expected_version
-        returning (streams.version - num_events + 1) into _version;
-      if not found then
-        raise 'Concurrency conflict. Last known expected version: %', expected_version;
-      end if;
+    update streams
+      set version = version + num_events
+      where id = _stream_id
+        and version = expected_version
+      returning (streams.version - num_events + 1) into _version;
+    if not found then
+      raise 'Concurrency conflict. Last known expected version: %', expected_version;
     end if;
   end if;
 
