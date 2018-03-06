@@ -8,7 +8,7 @@ class TestHandler
 
   on ItemAdded do |recorded_event|
     @added << recorded_event
-    @current_event_in_processing = _current_event
+    @current_event_in_processing = current_event
   end
 
   on ItemRemoved do |recorded_event|
