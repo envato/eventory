@@ -37,5 +37,5 @@ TOTAL_EVENTS = 50_000
   end_time = Time.now
   time_taken = end_time - start
 
-  puts "took #{time_taken} seconds to emit #{num_events_per_process} from #{concurrency} processes"
+  puts "#{time_taken.to_s.rjust(3, '0')} seconds"
 end
