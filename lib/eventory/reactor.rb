@@ -8,7 +8,7 @@ module Eventory
         causation_id: current_event.id,
         metadata: build_event_metadata
       })
-      event_store.append(stream_id, event_data)
+      event_store.append_events(stream_id, event_data)
     end
 
     def build_event_metadata

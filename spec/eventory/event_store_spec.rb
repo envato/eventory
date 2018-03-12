@@ -8,7 +8,7 @@ RSpec.describe Eventory::EventStore do
   describe '#save' do
     it 'saves an event' do
       event_id = SecureRandom.uuid
-      event_store.append(stream_id, Eventory::EventData.new(type: 'test', data: { a: 'b' }, id: event_id))
+      event_store.append_events(stream_id, Eventory::EventData.new(type: 'test', data: { a: 'b' }, id: event_id))
       events = database[:events].all
       expect(events.count).to eq 1
       event = events[0]
@@ -24,7 +24,7 @@ RSpec.describe Eventory::EventStore do
     end
 
     it 'saves multiple typed events' do
-      event_store.append(stream_id, [ItemAdded.new(item_id: 1, name: 'test'), ItemRemoved.new(item_id: 1)])
+      event_store.append_events(stream_id, [ItemAdded.new(item_id: 1, name: 'test'), ItemRemoved.new(item_id: 1)])
       events = database[:events].all
       expect(events.count).to eq 2
       event_1 = events[0]
@@ -49,7 +49,7 @@ RSpec.describe Eventory::EventStore do
     end
 
     it 'saves multiple events' do
-      event_store.append(stream_id, [Eventory::EventData.new(type: 'test', data: {a: 'b'}), Eventory::EventData.new(type: 'test2', data: {c: 'd'})])
+      event_store.append_events(stream_id, [Eventory::EventData.new(type: 'test', data: {a: 'b'}), Eventory::EventData.new(type: 'test2', data: {c: 'd'})])
       events = database[:events].all
       expect(events.count).to eq 2
       event_1 = events[0]
@@ -75,7 +75,7 @@ RSpec.describe Eventory::EventStore do
 
     it 'saves events with correlation_id' do
       cid = SecureRandom.uuid
-      event_store.append(stream_id, ItemRemoved.new(item_id: 1).to_event_data(correlation_id: cid))
+      event_store.append_events(stream_id, ItemRemoved.new(item_id: 1).to_event_data(correlation_id: cid))
       event = database[:events].all.last
       expect(event).to_not be_nil
       expect(event[:correlation_id]).to eq cid
@@ -83,14 +83,14 @@ RSpec.describe Eventory::EventStore do
 
     it 'saves events with causation_id' do
       cid = SecureRandom.uuid
-      event_store.append(stream_id, ItemRemoved.new(item_id: 1).to_event_data(causation_id: cid))
+      event_store.append_events(stream_id, ItemRemoved.new(item_id: 1).to_event_data(causation_id: cid))
       event = database[:events].all.last
       expect(event).to_not be_nil
       expect(event[:causation_id]).to eq cid
     end
 
     it 'defaults metadata to nil' do
-      event_store.append(stream_id, ItemRemoved.new(item_id: 1))
+      event_store.append_events(stream_id, ItemRemoved.new(item_id: 1))
       event = database[:events].all.last
       expect(event).to_not be_nil
       expect(event[:metadata]).to eq({})
@@ -98,7 +98,7 @@ RSpec.describe Eventory::EventStore do
 
     it 'saves events with metadata' do
       cid = SecureRandom.uuid
-      event_store.append(stream_id, ItemRemoved.new(item_id: 1).to_event_data(metadata: { git_sha: '82e5e57' }))
+      event_store.append_events(stream_id, ItemRemoved.new(item_id: 1).to_event_data(metadata: { git_sha: '82e5e57' }))
       event = database[:events].all.last
       expect(event).to_not be_nil
       expect(event[:metadata]).to eq('git_sha' => '82e5e57')
@@ -110,26 +110,26 @@ RSpec.describe Eventory::EventStore do
 
       context "when the stream doesn't exist" do
         it 'saves the event if the version is correct' do
-          event_store.append(stream_id, event, expected_version: 0)
+          event_store.append_events(stream_id, event, expected_version: 0)
         end
 
         it 'raises a concurrency error if the version is incorrect' do
           expect {
-            event_store.append(stream_id, event, expected_version: 1)
+            event_store.append_events(stream_id, event, expected_version: 1)
           }.to raise_error(Eventory::ConcurrencyError)
         end
       end
 
       context 'when the stream exists' do
-        before { event_store.append(stream_id, event_2) }
+        before { event_store.append_events(stream_id, event_2) }
 
         it 'saves the event if the version is correct' do
-          event_store.append(stream_id, event, expected_version: 1)
+          event_store.append_events(stream_id, event, expected_version: 1)
         end
 
         it 'raises a concurrency error if the version is incorrect' do
           expect {
-            event_store.append(stream_id, event, expected_version: 2)
+            event_store.append_events(stream_id, event, expected_version: 2)
           }.to raise_error(Eventory::ConcurrencyError)
         end
       end
@@ -143,9 +143,9 @@ RSpec.describe Eventory::EventStore do
     let(:stream_id_2) { SecureRandom.uuid }
 
     before do
-      event_store.append(stream_id, event)
-      event_store.append(stream_id, event_2)
-      event_store.append(stream_id_2, event_3)
+      event_store.append_events(stream_id, event)
+      event_store.append_events(stream_id, event_2)
+      event_store.append_events(stream_id_2, event_3)
     end
 
     describe '#read_all_events_from' do

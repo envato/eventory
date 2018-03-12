@@ -29,7 +29,7 @@ TOTAL_EVENTS = 50_000
   concurrency.times do
     fork do
       num_events_per_process.times do
-        event_store.append(stream_ids.sample, Eventory::EventData.new(type: 'test', data: { 'a' => '1' }))
+        event_store.append_events(stream_ids.sample, Eventory::EventData.new(type: 'test', data: { 'a' => '1' }))
       end
     end
   end
