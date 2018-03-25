@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+set -vx
+
+dropdb eventory_test || echo 'database did not exist'
+createdb eventory_test
+psql -d eventory_test -f schema.sql

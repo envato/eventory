@@ -1,6 +1,11 @@
-# PostgresEventStore
+# Eventory
 
-A simple event store with Postgres as a backend.
+A simple event store backed with Postgres.
+
+Biggest differences when compared to Event Sourcery:
+
+- A separate streams table to manage stream versions isn't used.
+- Custom event class modelling improvements - see RecordedEvent, EventData and Event.
 
 ## License
 

@@ -2,5 +2,5 @@ source "https://rubygems.org"
 
 git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 
-# Specify your gem's dependencies in postgres_event_store.gemspec
+# Specify your gem's dependencies in eventory.gemspec
 gemspec
