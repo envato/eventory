@@ -18,11 +18,10 @@ class TestReactor < Eventory::Reactor
 end
 
 RSpec.describe Eventory::Reactor do
-  subject(:test_reactor) { TestReactor.new(event_store: event_store, checkpoints: checkpoints, version: version) }
+  subject(:test_reactor) { TestReactor.new(event_store: event_store, checkpoints: checkpoints) }
   let(:event_store) { Eventory::EventStore.new(database: database) }
   let(:checkpoints) { Eventory::Checkpoints.new(database: database) }
   let(:namespace) { 'ns' }
-  let(:version) { 2 }
 
   it 'handles events' do
     recorded_event = recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 1))
