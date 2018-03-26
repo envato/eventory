@@ -10,11 +10,10 @@ class TestProjector < Eventory::Projector
 end
 
 RSpec.describe Eventory::Projector do
-  subject(:test_projector) { TestProjector.new(event_store: event_store, checkpoints: checkpoints, version: version) }
+  subject(:test_projector) { TestProjector.new(event_store: event_store, checkpoints: checkpoints) }
   let(:event_store) { Eventory::EventStore.new(database: database) }
   let(:checkpoints) { Eventory::Checkpoints.new(database: database) }
   let(:namespace) { 'ns' }
-  let(:version) { 2 }
 
   it 'handles events' do
     test_projector.process(recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 1)))

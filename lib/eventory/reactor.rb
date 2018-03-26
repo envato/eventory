@@ -1,5 +1,5 @@
 module Eventory
-  class Reactor < Projector
+  class Reactor < EventStreamProcessor
     private
 
     def append_event(stream_id, event)
