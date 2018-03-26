@@ -18,15 +18,11 @@ class TestReactor < Eventory::Reactor
 end
 
 RSpec.describe Eventory::Reactor do
-  subject(:test_reactor) { TestReactor.new(event_store: event_store, checkpoints: checkpoints, database: database, version: version) }
+  subject(:test_reactor) { TestReactor.new(event_store: event_store, checkpoints: checkpoints, version: version) }
   let(:event_store) { Eventory::EventStore.new(database: database) }
   let(:checkpoints) { Eventory::Checkpoints.new(database: database) }
   let(:namespace) { 'ns' }
   let(:version) { 2 }
-
-  before do
-    test_reactor.up
-  end
 
   it 'handles events' do
     recorded_event = recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 1))
@@ -66,7 +62,6 @@ RSpec.describe Eventory::Reactor do
 
   it 'tracks positions' do
     checkpoint = checkpoints.checkout(processor_name: 'test_reactor')
-    test_reactor.up
     test_reactor.process(recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 1)))
     expect(checkpoint.position).to eq 1
     test_reactor.process(recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 2)))
