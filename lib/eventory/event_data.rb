@@ -12,6 +12,7 @@ module Eventory
       @correlation_id = correlation_id
       @causation_id = causation_id
       @metadata = metadata
+      freeze
     end
 
     attr_reader :id, :type, :data, :correlation_id, :causation_id, :metadata

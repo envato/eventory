@@ -21,6 +21,7 @@ module Eventory
       @correlation_id = correlation_id
       @causation_id = causation_id
       @metadata = metadata
+      freeze
     end
 
     def event_type_class
