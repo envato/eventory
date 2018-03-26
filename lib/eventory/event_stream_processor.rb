@@ -3,7 +3,8 @@ module Eventory
     include EventHandler
     private :handle
 
-    def initialize(event_store:, checkpoints:)
+    def initialize(event_store:, checkpoints:, version: nil)
+      @version = version
       @event_store = event_store
       @checkpoint = checkpoints.checkout(processor_name: processor_name, event_types: self.class.handled_event_classes.map(&:to_s))
     end
@@ -69,7 +70,7 @@ module Eventory
 
     private
 
-    attr_reader :checkpoint, :event_store
+    attr_reader :checkpoint, :event_store, :version
 
     def optional_checkpoint_transaction(&block)
       if checkpoint_transaction
