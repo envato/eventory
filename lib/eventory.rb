@@ -14,6 +14,8 @@ require 'eventory/event_stream_processor'
 require 'eventory/schema_owner'
 require 'eventory/projector'
 require 'eventory/reactor'
+require 'eventory/aggregate_root'
+require 'eventory/aggregate_repository'
 
 module Eventory
 end

@@ -24,10 +24,19 @@ module Eventory
                     metadata: metadata)
     end
 
+    def event_type_class
+      self.class
+    end
+
     def attributes
       self.class.attributes.each_with_object({}) do |key, hash|
         hash[key] = instance_variable_get("@#{key}")
       end
     end
+
+    def ==(other)
+      instance_of?(other.class) && attributes == other.attributes
+    end
+    alias eql? ==
   end
 end
