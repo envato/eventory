@@ -1,24 +1,32 @@
-class TestReactor < Eventory::Reactor
-  subscription_options processor_name: 'test_reactor'
-
-  on ItemAdded do |recorded_event|
-    added << recorded_event
-    append_event(recorded_event.stream_id, ItemRemoved.new(item_id: recorded_event.data.item_id))
-  end
-
-  def added
-    @added ||= []
-  end
-
-  private
-
-  def build_event_metadata
-    { git_sha: '123' }
-  end
-end
-
 RSpec.describe Eventory::Reactor do
-  subject(:test_reactor) { TestReactor.new(event_store: event_store, checkpoints: checkpoints) }
+  def new_reactor(&block)
+    Class.new(Eventory::Reactor) do
+      class_eval(&block) if block_given?
+    end
+  end
+
+  let(:test_reactor_class) do
+    new_reactor do
+      subscription_options processor_name: 'test_reactor'
+
+      on ItemAdded do |recorded_event|
+        added << recorded_event
+        append_event(recorded_event.stream_id, ItemRemoved.new(item_id: recorded_event.data.item_id))
+      end
+
+      def added
+        @added ||= []
+      end
+
+      private
+
+      def build_event_metadata
+        { git_sha: '123' }
+      end
+    end
+  end
+
+  subject(:test_reactor) { test_reactor_class.new(event_store: event_store, checkpoints: checkpoints) }
   let(:event_store) { Eventory::EventStore.new(database: database) }
   let(:checkpoints) { Eventory::Checkpoints.new(database: database) }
   let(:namespace) { 'ns' }
