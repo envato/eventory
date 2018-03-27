@@ -11,11 +11,12 @@ module Eventory
 
     module ClassMethods
       def event_handlers
-        @event_handlers ||= Hash.new { |hash, key| hash[key] = [] }
+        @event_handlers ||= {}
       end
 
       def on(*event_classes, &block)
         event_classes.each do |event_class|
+          event_handlers[event_class] ||= []
           event_handlers[event_class] << block
         end
       end
@@ -35,7 +36,7 @@ module Eventory
 
     def handle_event(recorded_event)
       @current_event = recorded_event
-      self.class.event_handlers[recorded_event.event_type_class].each do |handler|
+      self.class.event_handlers.fetch(recorded_event.event_type_class, []).each do |handler|
         instance_exec(recorded_event, &handler)
       end
     ensure

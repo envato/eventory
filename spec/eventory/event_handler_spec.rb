@@ -41,6 +41,6 @@ RSpec.describe Eventory::EventHandler do
   end
 
   it 'returns handled event classes' do
-    expect(TestHandler.handled_event_classes).to eq([ItemAdded, ItemRemoved, ItemStarred])
+    expect(TestHandler.handled_event_classes).to eq([ItemAdded, ItemRemoved])
   end
 end
