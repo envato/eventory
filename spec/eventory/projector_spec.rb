@@ -1,16 +1,25 @@
-class TestProjector < Eventory::Projector
-  subscription_options processor_name: 'procname'
-
-  attr_accessor :state
-
-  on ItemAdded do |event|
-    self.state ||= []
-    self.state << event.data.item_id
-  end
-end
-
 RSpec.describe Eventory::Projector do
-  subject(:test_projector) { TestProjector.new(event_store: event_store, checkpoints: checkpoints) }
+  def new_projector(&block)
+    Class.new(Eventory::Projector) do
+      class_eval(&block) if block_given?
+    end
+  end
+
+  let(:test_projector_class) do
+    new_projector do
+      subscription_options processor_name: 'procname'
+
+      attr_accessor :state
+
+      on ItemAdded do |event|
+        self.state ||= []
+        self.state << event.data.item_id
+      end
+    end
+  end
+
+
+  subject(:test_projector) { test_projector_class.new(event_store: event_store, checkpoints: checkpoints) }
   let(:event_store) { Eventory::EventStore.new(database: database) }
   let(:checkpoints) { Eventory::Checkpoints.new(database: database) }
   let(:namespace) { 'ns' }
