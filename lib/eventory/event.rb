@@ -14,6 +14,7 @@ module Eventory
       self.class.attributes.each do |attribute|
         instance_variable_set("@#{attribute}", event_data_with_symbol_keys[attribute])
       end
+      freeze
     end
 
     def to_event_data(correlation_id: nil, causation_id: nil, metadata: {})
