@@ -1,6 +1,36 @@
 RSpec.describe Eventory::AggregateRoot do
   let(:aggregate_uuid) { SecureRandom.uuid }
-  subject(:aggregate) { Category.new(aggregate_uuid, events) }
+  let(:aggregate_class) do
+    Class.new(Eventory::AggregateRoot) do
+      def initialize(id)
+        @item_added_events = []
+        @item_removed_events = []
+        @added_and_removed_events = []
+        super
+      end
+
+      on ItemAdded do |event|
+        @item_added_events << event
+      end
+
+      on ItemRemoved do |event|
+        @item_removed_events << event
+      end
+
+      on ItemAdded, ItemRemoved do |event|
+        @added_and_removed_events << event
+      end
+
+      def add_item(item)
+        apply_event ItemAdded.new(item_id: item.id, name: item.name)
+      end
+
+      attr_reader :item_added_events,
+                  :item_removed_events,
+                  :added_and_removed_events
+    end
+  end
+  subject(:aggregate) { aggregate_class.load(aggregate_uuid, events) }
 
   context 'with no initial events' do
     let(:events) { [] }

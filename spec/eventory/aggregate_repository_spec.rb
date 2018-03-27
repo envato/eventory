@@ -2,9 +2,7 @@ class EmailChanged < Eventory::Event
   attribute :new_email
 end
 
-class User
-  include Eventory::AggregateRoot
-
+class User < Eventory::AggregateRoot
   on EmailChanged do |event|
     @email = event.new_email
   end

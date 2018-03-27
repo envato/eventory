@@ -1,14 +1,17 @@
 module Eventory
-  module AggregateRoot
-    def self.included(base)
-      base.send(:include, EventHandler)
+  class AggregateRoot
+    include EventHandler
+
+    def self.load(id, events)
+      new(id).tap do |aggregate|
+        aggregate.load_history(events)
+      end
     end
 
-    def initialize(id, events = [])
+    def initialize(id)
       @id = id.to_str
       @version = 0
       @changes = []
-      load_history(events)
     end
 
     def clear_changes
@@ -17,14 +20,14 @@ module Eventory
 
     attr_reader :id, :version, :changes
 
-    private
-
     def load_history(events)
       events.each do |event|
         handle_event(event)
         increment_version
       end
     end
+
+    private
 
     def increment_version
       @version += 1

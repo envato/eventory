@@ -8,7 +8,7 @@ module Eventory
     def load(aggregate_id)
       recorded_events = @event_store.read_stream_events(aggregate_id)
       events = recorded_events.map(&:data)
-      @aggregate_class.new(aggregate_id, events)
+      @aggregate_class.load(aggregate_id, events)
     end
 
     def save(aggregate)
