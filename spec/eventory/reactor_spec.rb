@@ -1,3 +1,9 @@
+class Item < Eventory::AggregateRoot
+  def remove(item_id:)
+    apply_event ItemRemoved.new(item_id: item_id)
+  end
+end
+
 RSpec.describe Eventory::Reactor do
   def new_reactor(&block)
     Class.new(Eventory::Reactor) do
@@ -11,17 +17,18 @@ RSpec.describe Eventory::Reactor do
 
       on ItemAdded do |recorded_event|
         added << recorded_event
-        append_event(recorded_event.stream_id, ItemRemoved.new(item_id: recorded_event.data.item_id))
+
+        aggregate_repository = Eventory::AggregateRepository.new(event_store, Item)
+        aggregate = aggregate_repository.load(recorded_event.stream_id)
+        aggregate.remove(item_id: recorded_event.data.item_id)
+        aggregate_repository.save(aggregate,
+                                  correlation_id: recorded_event.correlation_id,
+                                  causation_id: recorded_event.id,
+                                  metadata: { git_sha: '123' })
       end
 
       def added
         @added ||= []
-      end
-
-      private
-
-      def build_event_metadata
-        { git_sha: '123' }
       end
     end
   end
@@ -52,7 +59,7 @@ RSpec.describe Eventory::Reactor do
     expect(event.causation_id).to eq recorded_event.id
   end
 
-  it 'sets causation_id to the ID of the triggering event' do
+  it 'sets correlation_id to the ID of the triggering event' do
     correlation_id = SecureRandom.uuid
     recorded_event = recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 1), correlation_id: correlation_id)
     test_reactor.process(recorded_event)
@@ -60,7 +67,7 @@ RSpec.describe Eventory::Reactor do
     expect(event.correlation_id).to eq correlation_id
   end
 
-  it 'allows build_event_metadata to be overridden to set metadata on saved events' do
+  it 'allows passing arbitrary metadata on saved events' do
     recorded_event = recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 1))
     test_reactor.process(recorded_event)
     event = event_store.read_all_events_from(1).last

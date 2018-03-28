@@ -11,9 +11,17 @@ module Eventory
       @aggregate_class.load(aggregate_id, events)
     end
 
-    def save(aggregate)
+    def save(aggregate, correlation_id: nil, causation_id: nil, metadata: {})
       new_events = aggregate.changes
       if new_events.any?
+        new_events = new_events.map do |event|
+          event.to_event_data(
+            correlation_id: correlation_id,
+            causation_id: causation_id,
+            metadata: metadata,
+          )
+        end
+
         expected_version = aggregate.version - new_events.count
         @event_store.append_events(aggregate.id,
                                    new_events,
