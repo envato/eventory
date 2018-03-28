@@ -1,11 +1,8 @@
 module Eventory
   class AggregateRepository
-    def initialize(event_store, aggregate_class, correlation_id: nil, causation_id: nil, metadata: {})
+    def initialize(event_store, aggregate_class)
       @event_store = event_store
       @aggregate_class = aggregate_class
-      @correlation_id = correlation_id
-      @causation_id = causation_id
-      @metadata = metadata
     end
 
     def load(aggregate_id)
@@ -14,7 +11,7 @@ module Eventory
       @aggregate_class.load(aggregate_id, events)
     end
 
-    def save(aggregate)
+    def save(aggregate, correlation_id: nil, causation_id: nil, metadata: {})
       new_events = aggregate.changes
       if new_events.any?
         new_events = new_events.map do |event|
@@ -33,9 +30,5 @@ module Eventory
       aggregate.clear_changes
       true
     end
-
-    private
-
-    attr_reader :correlation_id, :causation_id, :metadata
   end
 end

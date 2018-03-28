@@ -18,13 +18,13 @@ RSpec.describe Eventory::Reactor do
       on ItemAdded do |recorded_event|
         added << recorded_event
 
-        aggregate_repository = Eventory::AggregateRepository.new(event_store, Item,
-                                                                 correlation_id: recorded_event.correlation_id,
-                                                                 causation_id: recorded_event.id,
-                                                                 metadata: { git_sha: '123' })
+        aggregate_repository = Eventory::AggregateRepository.new(event_store, Item)
         aggregate = aggregate_repository.load(recorded_event.stream_id)
         aggregate.remove(item_id: recorded_event.data.item_id)
-        aggregate_repository.save(aggregate)
+        aggregate_repository.save(aggregate,
+                                  correlation_id: recorded_event.correlation_id,
+                                  causation_id: recorded_event.id,
+                                  metadata: { git_sha: '123' })
       end
 
       def added
