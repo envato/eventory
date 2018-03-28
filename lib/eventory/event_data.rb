@@ -20,5 +20,14 @@ module Eventory
     def to_event_data
       self
     end
+
+    def ==(other)
+      id == other.id &&
+        type == other.type &&
+        data == other.data &&
+        correlation_id == other.correlation_id &&
+        causation_id == other.causation_id &&
+        metadata == other.metadata
+    end
   end
 end

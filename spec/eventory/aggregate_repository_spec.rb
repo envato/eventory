@@ -39,10 +39,13 @@ RSpec.describe Eventory::AggregateRepository do
     end
 
     it 'saves new events' do
+      event_id = SecureRandom.uuid
+      allow(SecureRandom).to receive(:uuid).and_return event_id
+
       aggregate.change_email('test2@test.com')
       expect(event_store).to receive(:append_events)
         .with(aggregate_id,
-             [EmailChanged.new(new_email: 'test2@test.com')],
+             [Eventory::EventData.new(type: 'EmailChanged', data: {new_email: 'test2@test.com'})],
              expected_version: 0)
       aggregate_repository.save(aggregate)
     end
@@ -65,10 +68,12 @@ RSpec.describe Eventory::AggregateRepository do
     end
 
     it 'saves new events' do
+      event_id = SecureRandom.uuid
+      allow(SecureRandom).to receive(:uuid).and_return event_id
       aggregate.change_email('test2@test.com')
       expect(event_store).to receive(:append_events)
         .with(aggregate_id,
-             [EmailChanged.new(new_email: 'test2@test.com')],
+             [Eventory::EventData.new(type: 'EmailChanged', data: {new_email: 'test2@test.com'})],
              expected_version: 1)
       aggregate_repository.save(aggregate)
     end

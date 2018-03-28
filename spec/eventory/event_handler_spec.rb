@@ -12,14 +12,13 @@ RSpec.describe Eventory::EventHandler do
 
       on ItemAdded do |recorded_event|
         @added << recorded_event
-        @current_event_in_processing = current_event
       end
 
       on ItemRemoved do |recorded_event|
         @removed << recorded_event
       end
 
-      attr_reader :added, :removed, :current_event_in_processing
+      attr_reader :added, :removed
     end
   end
   let(:item_added) { recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 1, name: 'Test!')) }
@@ -35,11 +34,6 @@ RSpec.describe Eventory::EventHandler do
   it 'ignores unknown event types' do
     event_handler.handle(item_starred)
     expect(event_handler.added + event_handler.removed).to eq []
-  end
-
-  it 'sets an ivar with the current processing event' do
-    event_handler.handle(item_added)
-    expect(event_handler.current_event_in_processing).to eq item_added
   end
 
   it 'returns handled event classes' do

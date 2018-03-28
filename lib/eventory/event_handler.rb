@@ -2,11 +2,6 @@ module Eventory
   module EventHandler
     def self.included(base)
       base.extend(ClassMethods)
-      base.class_eval do
-        private
-
-        attr_reader :current_event
-      end
     end
 
     module ClassMethods
@@ -35,12 +30,9 @@ module Eventory
     private
 
     def handle_event(recorded_event)
-      @current_event = recorded_event
       self.class.event_handlers.fetch(recorded_event.event_type_class, []).each do |handler|
         instance_exec(recorded_event, &handler)
       end
-    ensure
-      @current_event = nil
     end
   end
 end
