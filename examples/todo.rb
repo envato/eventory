@@ -172,6 +172,8 @@ class API
 
   def start_console
     display_projections
+    puts
+    puts "Available methods: #{(methods - Object.methods).join(', ')}"
     binding.pry
   end
 
