@@ -52,7 +52,7 @@ RSpec.describe Eventory::Reactor do
     expect(event.causation_id).to eq recorded_event.id
   end
 
-  it 'sets causation_id to the ID of the triggering event' do
+  it 'sets correlation_id to the ID of the triggering event' do
     correlation_id = SecureRandom.uuid
     recorded_event = recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 1), correlation_id: correlation_id)
     test_reactor.process(recorded_event)
