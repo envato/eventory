@@ -34,6 +34,7 @@ RSpec.describe Eventory::EventStreamProcessor do
   let(:checkpoints) { Eventory::Checkpoints.new(database: database) }
   let(:item_added) { recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 1, name: 'test')) }
   let(:item_removed) { recorded_event(type: 'ItemRemoved', data: ItemRemoved.new(item_id: 1)) }
+  let(:item_starred) { recorded_event(type: 'ItemStarred', data: ItemStarred.new(item_id: 1)) }
 
   def stub_checkpoint
     checkpoint_double = instance_double(Eventory::Checkpoint)
@@ -45,11 +46,22 @@ RSpec.describe Eventory::EventStreamProcessor do
     checkpoint_double
   end
 
+  describe '.handled_event_classes' do
+    it 'returns handled event classes' do
+      expect(esp.class.handled_event_classes).to eq([ItemAdded, ItemRemoved])
+    end
+  end
+
   describe '#process' do
     it 'processes events' do
       esp.process([item_added, item_removed])
       expect(esp.added).to eq [item_added]
       expect(esp.removed).to eq [item_removed]
+    end
+
+    it 'ignores unknown event types' do
+      esp.process(item_starred)
+      expect(esp.added + esp.removed).to eq []
     end
 
     it 'saves the last processed event number with checkpoint' do

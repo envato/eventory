@@ -52,6 +52,14 @@ RSpec.describe Eventory::AggregateRoot do
     it "updates it's version" do
       expect(aggregate.version).to eq events.count
     end
+
+    context 'with unknown event types' do
+      let(:events) { [ItemStarred.new(id: 1)] }
+
+      it 'ignores unknown event types' do
+        expect(aggregate.item_added_events + aggregate.item_removed_events + aggregate.added_and_removed_events).to eq []
+      end
+    end
   end
 
   context 'when state changes' do

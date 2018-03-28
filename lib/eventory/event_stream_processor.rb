@@ -1,8 +1,5 @@
 module Eventory
   class EventStreamProcessor
-    include EventHandler
-    private :handle
-
     def initialize(event_store:, checkpoints:)
       @event_store = event_store
       @checkpoint = checkpoints.checkout(processor_name: processor_name, event_types: self.class.handled_event_classes.map(&:to_s))
@@ -41,6 +38,20 @@ module Eventory
       end
     end
 
+    def self.on(*event_classes, &block)
+      event_classes.each do |event_class|
+        event_handlers.add(event_class, block)
+      end
+    end
+
+    def self.event_handlers
+      @event_handlers ||= EventHandlers.new
+    end
+
+    def self.handled_event_classes
+      event_handlers.handled_event_classes
+    end
+
     def process(events)
       events = Array(events)
       optional_checkpoint_transaction do
@@ -76,6 +87,12 @@ module Eventory
         checkpoint.transaction(&block)
       else
         block.call
+      end
+    end
+
+    def handle_event(recorded_event)
+      self.class.event_handlers.for(recorded_event.event_type_class).each do |handler|
+        instance_exec(recorded_event, &handler)
       end
     end
   end
