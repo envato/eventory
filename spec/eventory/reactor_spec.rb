@@ -1,4 +1,4 @@
-class Item < Eventory::AggregateRoot
+class Item < Eventory::Domain::AggregateRoot
   def remove(item_id:)
     apply_event ItemRemoved.new(item_id: item_id)
   end
@@ -18,7 +18,7 @@ RSpec.describe Eventory::Reactor do
       on ItemAdded do |recorded_event|
         added << recorded_event
 
-        aggregate_repository = Eventory::AggregateRepository.new(event_store, Item)
+        aggregate_repository = Eventory::Domain::AggregateRepository.new(event_store, Item)
         aggregate = aggregate_repository.load(recorded_event.stream_id)
         aggregate.remove(item_id: recorded_event.data.item_id)
         aggregate_repository.save(aggregate,

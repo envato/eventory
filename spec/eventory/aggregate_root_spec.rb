@@ -1,7 +1,7 @@
-RSpec.describe Eventory::AggregateRoot do
+RSpec.describe Eventory::Domain::AggregateRoot do
   let(:aggregate_uuid) { SecureRandom.uuid }
   let(:aggregate_class) do
-    Class.new(Eventory::AggregateRoot) do
+    Class.new(Eventory::Domain::AggregateRoot) do
       def initialize(id)
         @item_added_events = []
         @item_removed_events = []
