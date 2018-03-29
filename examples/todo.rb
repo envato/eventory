@@ -35,7 +35,6 @@ class ToDoList < Eventory::AggregateRoot
   def initialize(id)
     super
     @todos = {}
-    @todo_id_seq = 0
   end
 
   on ToDoListCreated do |event|
@@ -47,12 +46,11 @@ class ToDoList < Eventory::AggregateRoot
   end
 
   on ToDoAdded do |event|
-    @todo_id_seq = event.id
     @todos[event.id] = ToDo.new(id: event.id, name: event.name)
   end
 
-  def add_todo(name:)
-    apply_event ToDoAdded.new(id: next_todo_id, name: name)
+  def add_todo(id:, name:)
+    apply_event ToDoAdded.new(id: id, name: name)
   end
 
   on ToDoCompleted do |event|
@@ -61,12 +59,6 @@ class ToDoList < Eventory::AggregateRoot
 
   def complete(id:)
     apply_event ToDoCompleted.new(id: id)
-  end
-
-  private
-
-  def next_todo_id
-    @todo_id_seq += 1
   end
 end
 
@@ -140,10 +132,12 @@ class API
     todo_list_repository.save(todo_list)
   end
 
-  def add_todo(todo_list_id:, name:)
-    todo_list = todo_list_repository.load(todo_list_id)
-    todo_list.add_todo(name: name)
-    todo_list_repository.save(todo_list)
+  def add_todo(todo_list_id:, id: SecureRandom.uuid, name:)
+    id.tap do |id|
+      todo_list = todo_list_repository.load(todo_list_id)
+      todo_list.add_todo(id: id, name: name)
+      todo_list_repository.save(todo_list)
+    end
   end
 
   def complete_todo(todo_list_id:, id:)
