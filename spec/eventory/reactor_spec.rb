@@ -34,7 +34,7 @@ RSpec.describe Eventory::Reactor do
   end
 
   subject(:test_reactor) { test_reactor_class.new(event_store: event_store, checkpoints: checkpoints) }
-  let(:event_store) { Eventory::EventStore.new(database: database) }
+  let(:event_store) { Eventory::EventStore::Postgres::EventStore.new(database: database) }
   let(:checkpoints) { Eventory::Checkpoints.new(database: database) }
   let(:namespace) { 'ns' }
 
