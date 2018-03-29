@@ -1,4 +1,4 @@
-RSpec.describe Eventory::Subscription do
+RSpec.describe Eventory::EventStreamProcessing::Subscription do
   subject(:subscription) { described_class.new(event_store: event_store, from_event_number: from_event_number, event_types: ['test']) }
   let(:from_event_number) { 0 }
   let(:event_store) { instance_double(Eventory::EventStore::Postgres::EventStore) }

@@ -1,6 +1,6 @@
-RSpec.describe Eventory::Projector do
+RSpec.describe Eventory::EventStreamProcessing::Projector do
   def new_projector(&block)
-    Class.new(Eventory::Projector) do
+    Class.new(Eventory::EventStreamProcessing::Projector) do
       class_eval(&block) if block_given?
     end
   end
@@ -21,7 +21,7 @@ RSpec.describe Eventory::Projector do
 
   subject(:test_projector) { test_projector_class.new(event_store: event_store, checkpoints: checkpoints) }
   let(:event_store) { Eventory::EventStore::Postgres::EventStore.new(database: database) }
-  let(:checkpoints) { Eventory::Checkpoints.new(database: database) }
+  let(:checkpoints) { Eventory::EventStreamProcessing::Postgres::Checkpoints.new(database: database) }
   let(:namespace) { 'ns' }
 
   it 'handles events' do
