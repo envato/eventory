@@ -31,7 +31,7 @@ class ToDo
   attr_reader :id, :name
 end
 
-class ToDoList < Eventory::AggregateRoot
+class ToDoList < Eventory::Domain::AggregateRoot
   def initialize(id)
     super
     @todos = {}
@@ -62,7 +62,7 @@ class ToDoList < Eventory::AggregateRoot
   end
 end
 
-class ToDoListProjection < Eventory::EventStreamProcessor
+class ToDoListProjection < Eventory::EventStreamProcessing::EventStreamProcessor
   def initialize(event_store:, checkpoints:)
     super
     @lists = {}
@@ -75,7 +75,7 @@ class ToDoListProjection < Eventory::EventStreamProcessor
   attr_reader :lists
 end
 
-class ToDoProjection < Eventory::EventStreamProcessor
+class ToDoProjection < Eventory::EventStreamProcessing::EventStreamProcessor
   def initialize(event_store:, checkpoints:)
     super
     @todos_by_list = {}
@@ -196,7 +196,7 @@ class API
   end
 
   def repository(aggregate_class)
-    Eventory::AggregateRepository.new(event_store, aggregate_class)
+    Eventory::Domain::AggregateRepository.new(event_store, aggregate_class)
   end
 
   def todo_repository
@@ -208,7 +208,7 @@ class API
   end
 
   def event_store
-    Eventory::EventStore.new(database: @db)
+    Eventory::PostgresEventStore.new(database: @db)
   end
 end
 
@@ -221,7 +221,7 @@ db.extension(:pg_array)
 db.extension(:pg_json)
 db.logger = Logger.new(STDOUT) if ENV['LOG']
 
-event_store = Eventory::EventStore.new(database: db)
+event_store = Eventory::PostgresEventStore.new(database: db)
 api = API.new(db: db)
 
 def uuid(identifier)
