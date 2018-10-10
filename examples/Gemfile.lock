@@ -1,0 +1,29 @@
+PATH
+  remote: ..
+  specs:
+    eventory (0.1.0)
+      pg
+      sequel (~> 5.5)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    coderay (1.1.2)
+    method_source (0.9.0)
+    pg (1.0.0)
+    pry (0.11.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
+    sequel (5.6.0)
+    uuidtools (2.1.5)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  eventory!
+  pry
+  uuidtools
+
+BUNDLED WITH
+   1.16.1

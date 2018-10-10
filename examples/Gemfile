@@ -1,0 +1,5 @@
+source 'https://rubygems.org'
+
+gem 'eventory', path: '../'
+gem 'pry'
+gem 'uuidtools'
