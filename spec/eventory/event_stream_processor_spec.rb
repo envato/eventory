@@ -30,7 +30,7 @@ RSpec.describe Eventory::EventStreamProcessing::EventStreamProcessor do
   end
   subject(:esp) { esp_class.new(event_store: event_store, checkpoints: checkpoints) }
 
-  let(:event_store) { Eventory::EventStore::Postgres::EventStore.new(database: database) }
+  let(:event_store) { Eventory::PostgresEventStore.new(database: database) }
   let(:checkpoints) { Eventory::EventStreamProcessing::Postgres::Checkpoints.new(database: database) }
   let(:item_added) { recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 1, name: 'test')) }
   let(:item_removed) { recorded_event(type: 'ItemRemoved', data: ItemRemoved.new(item_id: 1)) }

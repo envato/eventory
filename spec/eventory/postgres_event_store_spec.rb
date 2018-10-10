@@ -1,4 +1,4 @@
-RSpec.describe Eventory::EventStore::Postgres::EventStore do
+RSpec.describe Eventory::PostgresEventStore do
   subject(:event_store) { described_class.new(database: database) }
   let(:stream_id) { SecureRandom.uuid }
   before do

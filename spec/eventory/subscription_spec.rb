@@ -1,7 +1,7 @@
 RSpec.describe Eventory::EventStreamProcessing::Subscription do
   subject(:subscription) { described_class.new(event_store: event_store, from_event_number: from_event_number, event_types: ['test']) }
   let(:from_event_number) { 0 }
-  let(:event_store) { instance_double(Eventory::EventStore::Postgres::EventStore) }
+  let(:event_store) { instance_double(Eventory::PostgresEventStore) }
   let(:events) { [instance_double(Eventory::RecordedEvent, number: 1)] }
 
   it 'reads new events from the starting position then from the last event number + 1' do

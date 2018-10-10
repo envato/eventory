@@ -1,5 +1,5 @@
-require 'eventory/event_store/event_builder'
-require 'eventory/event_store/postgres/event_store'
+require 'eventory/event_builder'
+require 'eventory/postgres_event_store'
 
 module Eventory
   module EventStore
