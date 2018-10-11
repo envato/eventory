@@ -31,7 +31,7 @@ class ToDo
   attr_reader :id, :name
 end
 
-class ToDoList < Eventory::Domain::AggregateRoot
+class ToDoList < Eventory::AggregateRoot
   def initialize(id)
     super
     @todos = {}
@@ -196,7 +196,7 @@ class API
   end
 
   def repository(aggregate_class)
-    Eventory::Domain::AggregateRepository.new(event_store, aggregate_class)
+    Eventory::AggregateRepository.new(event_store, aggregate_class)
   end
 
   def todo_repository

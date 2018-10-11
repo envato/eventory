@@ -2,7 +2,7 @@ class EmailChanged < Eventory::Event
   attribute :new_email
 end
 
-class User < Eventory::Domain::AggregateRoot
+class User < Eventory::AggregateRoot
   on EmailChanged do |event|
     @email = event.new_email
   end
@@ -14,7 +14,7 @@ class User < Eventory::Domain::AggregateRoot
   end
 end
 
-RSpec.describe Eventory::Domain::AggregateRepository do
+RSpec.describe Eventory::AggregateRepository do
   let(:event_store) { instance_double(Eventory::PostgresEventStore) }
   let(:aggregate_id) { SecureRandom.uuid }
   subject(:aggregate_repository) { described_class.new(event_store, User) }
