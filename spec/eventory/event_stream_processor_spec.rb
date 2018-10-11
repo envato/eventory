@@ -1,6 +1,6 @@
-RSpec.describe Eventory::EventStreamProcessor do
+RSpec.describe Eventory::EventStreamProcessing::EventStreamProcessor do
   def new_event_stream_processor(&block)
-    Class.new(Eventory::EventStreamProcessor) do
+    Class.new(Eventory::EventStreamProcessing::EventStreamProcessor) do
       class_eval(&block) if block_given?
     end
   end
@@ -30,14 +30,14 @@ RSpec.describe Eventory::EventStreamProcessor do
   end
   subject(:esp) { esp_class.new(event_store: event_store, checkpoints: checkpoints) }
 
-  let(:event_store) { Eventory::EventStore.new(database: database) }
-  let(:checkpoints) { Eventory::Checkpoints.new(database: database) }
+  let(:event_store) { Eventory::PostgresEventStore.new(database: database) }
+  let(:checkpoints) { Eventory::EventStreamProcessing::Postgres::Checkpoints.new(database: database) }
   let(:item_added) { recorded_event(type: 'ItemAdded', data: ItemAdded.new(item_id: 1, name: 'test')) }
   let(:item_removed) { recorded_event(type: 'ItemRemoved', data: ItemRemoved.new(item_id: 1)) }
   let(:item_starred) { recorded_event(type: 'ItemStarred', data: ItemStarred.new(item_id: 1)) }
 
   def stub_checkpoint
-    checkpoint_double = instance_double(Eventory::Checkpoint)
+    checkpoint_double = instance_double(Eventory::EventStreamProcessing::Postgres::Checkpoint)
     allow(checkpoint_double).to receive(:transaction).and_yield
     allow(checkpoint_double).to receive(:save_position)
     allow(checkpoints).to receive(:checkout)
@@ -107,7 +107,7 @@ RSpec.describe Eventory::EventStreamProcessor do
     end
 
     context 'without a configured name' do
-      class self::TestESP2 < Eventory::EventStreamProcessor; end
+      class self::TestESP2 < Eventory::EventStreamProcessing::EventStreamProcessor; end
 
       let(:esp) { self.class::TestESP2.new(event_store: event_store, checkpoints: checkpoints) }
 
@@ -161,11 +161,11 @@ RSpec.describe Eventory::EventStreamProcessor do
 
   describe '#start' do
     it 'starts a subscription with correct args' do
-      subscription = instance_double(Eventory::Subscription)
-      allow(Eventory::Subscription).to receive(:new).and_return(subscription)
+      subscription = instance_double(Eventory::EventStreamProcessing::Subscription)
+      allow(Eventory::EventStreamProcessing::Subscription).to receive(:new).and_return(subscription)
       allow(subscription).to receive(:start).and_yield([])
       esp.start
-      expect(Eventory::Subscription).to have_received(:new).with(
+      expect(Eventory::EventStreamProcessing::Subscription).to have_received(:new).with(
         event_store: event_store,
         from_event_number: 1,
         event_types: ['ItemAdded', 'ItemRemoved'],

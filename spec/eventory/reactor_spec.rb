@@ -4,9 +4,9 @@ class Item < Eventory::AggregateRoot
   end
 end
 
-RSpec.describe Eventory::Reactor do
+RSpec.describe Eventory::EventStreamProcessing::Reactor do
   def new_reactor(&block)
-    Class.new(Eventory::Reactor) do
+    Class.new(Eventory::EventStreamProcessing::Reactor) do
       class_eval(&block) if block_given?
     end
   end
@@ -34,8 +34,8 @@ RSpec.describe Eventory::Reactor do
   end
 
   subject(:test_reactor) { test_reactor_class.new(event_store: event_store, checkpoints: checkpoints) }
-  let(:event_store) { Eventory::EventStore.new(database: database) }
-  let(:checkpoints) { Eventory::Checkpoints.new(database: database) }
+  let(:event_store) { Eventory::PostgresEventStore.new(database: database) }
+  let(:checkpoints) { Eventory::EventStreamProcessing::Postgres::Checkpoints.new(database: database) }
   let(:namespace) { 'ns' }
 
   it 'handles events' do

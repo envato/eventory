@@ -15,7 +15,7 @@ class User < Eventory::AggregateRoot
 end
 
 RSpec.describe Eventory::AggregateRepository do
-  let(:event_store) { instance_double(Eventory::EventStore) }
+  let(:event_store) { instance_double(Eventory::PostgresEventStore) }
   let(:aggregate_id) { SecureRandom.uuid }
   subject(:aggregate_repository) { described_class.new(event_store, User) }
   let(:aggregate) { aggregate_repository.load(aggregate_id) }

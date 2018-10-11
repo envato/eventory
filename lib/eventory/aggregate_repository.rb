@@ -23,9 +23,11 @@ module Eventory
         end
 
         expected_version = aggregate.version - new_events.count
-        @event_store.append_events(aggregate.id,
-                                   new_events,
-                                   expected_version: expected_version)
+        @event_store.append_events(
+          aggregate.id,
+          new_events,
+          expected_version: expected_version
+        )
       end
       aggregate.clear_changes
       true

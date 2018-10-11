@@ -1,17 +1,17 @@
-RSpec.describe Eventory::PersistentSubscription do
+RSpec.describe Eventory::EventStreamProcessing::PersistentSubscription do
   subject(:persistent_subscription) { described_class.new(event_store: event_store, checkpoint: checkpoint, event_types: ['test']) }
   let(:event_store) { double }
-  let(:subscription) { instance_double(Eventory::Subscription) }
+  let(:subscription) { instance_double(Eventory::EventStreamProcessing::Subscription) }
   let(:events) { [instance_double(Eventory::RecordedEvent, number: 1)] }
-  let(:checkpoint) { Eventory::Checkpoint.new(database: database, name: 'test') }
+  let(:checkpoint) { Eventory::EventStreamProcessing::Postgres::Checkpoint.new(database: database, name: 'test') }
 
   before do
-    allow(Eventory::Subscription).to receive(:new).and_return(subscription)
+    allow(Eventory::EventStreamProcessing::Subscription).to receive(:new).and_return(subscription)
     allow(subscription).to receive(:start).and_yield(events)
   end
 
   it 'uses a Subscription with correct args' do
-    expect(Eventory::Subscription).to receive(:new).with(
+    expect(Eventory::EventStreamProcessing::Subscription).to receive(:new).with(
       event_store: event_store,
       from_event_number: 1,
       event_types: ['test'],
