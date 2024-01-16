@@ -36,7 +36,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 1.16)
   database_cleaner
   eventory!
   pry
@@ -44,4 +43,4 @@ DEPENDENCIES
   rspec (~> 3.0)
 
 BUNDLED WITH
-   1.16.0
+   2.3.27
